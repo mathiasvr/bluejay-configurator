@@ -45,16 +45,7 @@
   "scripts": {
     "build": "babel tabs/esc.jsx -o js/build/esc.js && babel jsx --out-dir js/build",
     "start": "gulp debug",
-    "_postinstall": "platform-dependent-modules",
-    "__postinstall": "yarn _postinstall",
     "gulp": "gulp",
     "test": "echo \"No tests yet.\""
-  },
-  "config": {
-    "platformDependentModules": {
-      "darwin": [
-        "gulp-appdmg@1.0.3"
-      ]
-    }
   }
 }
