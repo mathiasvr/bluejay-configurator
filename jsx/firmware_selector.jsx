@@ -10,14 +10,17 @@ var FirmwareSelector = React.createClass({
         const escHint = this.props.escHint;
 
         var selectedEsc;
-        if (this.props.supportedBlheliESCs.layouts[BLHELI_TYPES.BLHELI_S_SILABS].hasOwnProperty(escHint) ||
+        if (this.props.supportedBluejayESCs.layouts[BLUEJAY_TYPES.EFM8].hasOwnProperty(escHint) ||
+            this.props.supportedBlheliESCs.layouts[BLHELI_TYPES.BLHELI_S_SILABS].hasOwnProperty(escHint) ||
             this.props.supportedBlheliESCs.layouts[BLHELI_TYPES.SILABS].hasOwnProperty(escHint) ||
             this.props.supportedBlheliESCs.layouts[BLHELI_TYPES.ATMEL].hasOwnProperty(escHint)) {
             selectedEsc = escHint;
         }
 
         var type;
-        if (findMCU(this.props.signatureHint, this.props.supportedBlheliESCs.signatures[BLHELI_TYPES.BLHELI_S_SILABS])) {
+        if (findMCU(this.props.signatureHint, this.props.supportedBluejayESCs.signatures[BLUEJAY_TYPES.EFM8])) {
+            type = BLUEJAY_TYPES.EFM8;
+        } else if (findMCU(this.props.signatureHint, this.props.supportedBlheliESCs.signatures[BLHELI_TYPES.BLHELI_S_SILABS])) {
             type = BLHELI_TYPES.BLHELI_S_SILABS;
         } else if (findMCU(this.props.signatureHint, this.props.supportedBlheliESCs.signatures[BLHELI_TYPES.SILABS])) {
             type = BLHELI_TYPES.SILABS;
@@ -48,12 +51,15 @@ var FirmwareSelector = React.createClass({
                         {this.renderEscSelect()}
                         {this.renderModeSelect()}
                         {this.renderVersionSelect()}
+                        {this.renderPwmFreqSelect()}
                         <div className="default_btn">
                             <a
                                 href="#"
                                 className={
                                     this.state.selectedEsc &&
-                                    ([ BLHELI_TYPES.BLHELI_S_SILABS, OPEN_ESC_TYPES.ARM ].includes(this.state.type) || this.state.selectedMode) &&
+                                    ([BLHELI_TYPES.BLHELI_S_SILABS, OPEN_ESC_TYPES.ARM ].includes(this.state.type) ||
+                                    (this.state.selectedMode && this.state.type !== BLUEJAY_TYPES.EFM8 ) || 
+                                    (this.state.type === BLUEJAY_TYPES.EFM8 && this.state.selectedPwmFreq)) &&
                                     this.state.selectedVersion !== -1 ? "" : "disabled"
                                 }
                                 onClick={this.onlineFirmwareSelected}
@@ -83,7 +89,7 @@ var FirmwareSelector = React.createClass({
         );
     },
     renderEscSelect: function() {
-        const description = this.props.supportedBlheliESCs.layouts[this.state.type] || this.props.supportedOpenEscESCs.layouts[this.state.type];
+        const description = this.props.supportedBlheliESCs.layouts[this.state.type] || this.props.supportedBluejayESCs.layouts[this.state.type] || this.props.supportedOpenEscESCs.layouts[this.state.type];
 
         var escs = [
             <option className="hidden" disabled selected>Select ESC</option>
@@ -136,8 +142,33 @@ var FirmwareSelector = React.createClass({
             );
         }
     },
+    renderPwmFreqSelect: function() {
+        // Display only for Bluejay
+        if (this.state.type === BLUEJAY_TYPES.EFM8) {
+            var pwmFreqs = [
+                <option className="hidden" disabled selected>Select PWM Frequency</option>
+            ];
+
+            for (const freq of ['24', '48', '96']) {
+                pwmFreqs.push(
+                    <option value={freq}>{freq}</option>
+                );
+            }
+
+            return (
+                <div className="select">
+                    <label>
+                        <select onChange={this.pwmFreqSelected} value={this.state.selectedPwmFreq}>
+                            {pwmFreqs}
+                        </select>
+                        <span>PWM Frequency</span>
+                    </label>
+                </div>
+            );
+        }
+    },
     renderVersionSelect: function() {
-        const versions = this.props.blheliFirmwareVersions[this.state.type] || this.props.openEscFirmwareVersions[this.state.type];
+        const versions = this.props.blheliFirmwareVersions[this.state.type] || this.props.bluejayFirmwareVersions[this.state.type] || this.props.openEscFirmwareVersions[this.state.type];
 
         var options = [];
         versions.forEach((version, idx) => {
@@ -173,24 +204,29 @@ var FirmwareSelector = React.createClass({
             selectedVersion: -1
         });
     },
+    pwmFreqSelected: function(e) {
+        this.setState({
+            selectedPwmFreq: e.target.value
+        });
+    },
     versionSelected: function(e) {
         this.setState({
             selectedVersion: e.target.value
         });
     },
     onlineFirmwareSelected: async function() {
-        const versions = this.props.blheliFirmwareVersions[this.state.type] || this.props.openEscFirmwareVersions[this.state.type];
+        const versions = this.props.blheliFirmwareVersions[this.state.type] || this.props.bluejayFirmwareVersions[this.state.type] || this.props.openEscFirmwareVersions[this.state.type];
         const version = versions[this.state.selectedVersion];
-        const escs = this.props.supportedBlheliESCs.layouts[this.state.type] || this.props.supportedOpenEscESCs.layouts[this.state.type];
+        const escs = this.props.supportedBlheliESCs.layouts[this.state.type] || this.props.supportedBluejayESCs.layouts[this.state.type] || this.props.supportedOpenEscESCs.layouts[this.state.type];
 
         // @todo this replace-based conversion does not work for some ESC files, add a lookup table
         const url = version.url.format(
-            escs[this.state.selectedEsc].fileName || escs[this.state.selectedEsc].name.replace(/[\s-]/g, '_').toUpperCase(),
+            escs[this.state.selectedEsc].fileName || (escs[this.state.selectedEsc].name.replace(/[\s-]/g, '_').toUpperCase() + (this.state.selectedPwmFreq ? '_' + this.state.selectedPwmFreq : '')),
             this.state.selectedMode
         );
 
-        const cacheKey = this.state.type === BLHELI_TYPES.BLHELI_S_SILABS ?
-            version.key + '_' + this.state.selectedEsc :
+        const cacheKey = this.state.type === BLHELI_TYPES.BLHELI_S_SILABS || this.state.type === BLUEJAY_TYPES.EFM8 ?
+            version.key + '_' + this.state.selectedEsc + (this.state.selectedPwmFreq ? '_' + this.state.selectedPwmFreq : '') :
             version.key + '_' + this.state.selectedEsc + '_' + this.state.selectedMode;
 
         try {
@@ -200,7 +236,7 @@ var FirmwareSelector = React.createClass({
                 eep = await getFromCache(cacheKey + 'EEP', url.replace('Hex files', 'Eeprom files').replace('.HEX', '.EEP'));
             }
 
-            googleAnalytics.sendEvent('ESC', 'RemoteFirmwareLoaded', cacheKey);
+            // googleAnalytics.sendEvent('ESC', 'RemoteFirmwareLoaded', cacheKey);
 
             if (Debug.enabled) {
                 console.log('loaded hex', hex.length, eep ? 'eep ' + eep.length: '');
@@ -216,7 +252,7 @@ var FirmwareSelector = React.createClass({
                 error.message
             ));
 
-            googleAnalytics.sendEvent('ESC', 'RemoteFirmwareLoadFailed', version.key);
+            // googleAnalytics.sendEvent('ESC', 'RemoteFirmwareLoadFailed', version.key);
         }
     },
     localFirmwareSelected: async function() {
@@ -227,7 +263,7 @@ var FirmwareSelector = React.createClass({
                 eep = await selectFile('eep');
             }
 
-            googleAnalytics.sendEvent('ESC', 'LocalFirmwareLoaded');
+            // googleAnalytics.sendEvent('ESC', 'LocalFirmwareLoaded');
 
             this.props.onFirmwareLoaded(hex, eep);
         } catch (error) {

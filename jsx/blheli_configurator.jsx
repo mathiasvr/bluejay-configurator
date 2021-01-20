@@ -41,13 +41,27 @@ var Configurator = React.createClass({
     },
     updateVersionsMetainfo: function() {
         fetchJSON(BLHELI_ESCS_KEY, BLHELI_ESCS_REMOTE, BLHELI_ESCS_LOCAL)
-        .then(json => this.setState({ supportedBlheliESCs: json }));
+        .then(json => {
+            // todo: only bluejay flash for now
+            json.layouts[BLHELI_TYPES.BLHELI_S_SILABS] = {}
+            this.setState({ supportedBlheliESCs: json })
+        });
+
+        fetchJSON(BLUEJAY_ESCS_KEY, BLUEJAY_ESCS_REMOTE, BLUEJAY_ESCS_LOCAL)
+        .then(json => this.setState({ supportedBluejayESCs: json }));
 
         fetchJSON(OPEN_ESC_ESCS_KEY, OPEN_ESC_ESCS_REMOTE, OPEN_ESC_ESCS_LOCAL)
         .then(json => this.setState({ supportedOpenEscESCs: json }));
 
         fetchJSON(BLHELI_VERSIONS_KEY, BLHELI_VERSIONS_REMOTE, BLHELI_VERSIONS_LOCAL)
-        .then(json => this.setState({ blheliFirmwareVersions: json }));
+        .then(json => {
+            // todo: only bluejay flash for now
+            json[BLHELI_TYPES.BLHELI_S_SILABS] = {}
+            this.setState({ blheliFirmwareVersions: json })
+        });
+
+        fetchJSON(BLUEJAY_VERSIONS_KEY, BLUEJAY_VERSIONS_REMOTE, BLUEJAY_VERSIONS_LOCAL)
+        .then(json => this.setState({ bluejayFirmwareVersions: json }));
 
         fetchJSON(OPEN_ESC_VERSIONS_KEY, OPEN_ESC_VERSIONS_REMOTE, OPEN_ESC_VERSIONS_LOCAL)
         .then(json => this.setState({ openEscFirmwareVersions: json }));
@@ -151,20 +165,20 @@ var Configurator = React.createClass({
                 escSettings[esc] = settings;
                 escMetainfo[esc].available = true;
 
-                googleAnalytics.sendEvent('ESC', 'VERSION', settings.MAIN_REVISION + '.' + settings.SUB_REVISION);
-                googleAnalytics.sendEvent('ESC', 'LAYOUT', settings.LAYOUT ? settings.LAYOUT.replace(/#/g, '') : `Arm_${settings.LAYOUT_REVISION}`);
-                googleAnalytics.sendEvent('ESC', 'MODE', settings.MODE ? blheliModeToString(settings.MODE) : null);
-                googleAnalytics.sendEvent('ESC', 'COMMUTATION_TIMING', settings.COMMUTATION_TIMING);
-                googleAnalytics.sendEvent('ESC', 'DEMAG_COMPENSATION', settings.DEMAG_COMPENSATION);
-                googleAnalytics.sendEvent('ESC', 'STARTUP_POWER', settings.STARTUP_POWER);
-                googleAnalytics.sendEvent('ESC', 'PPM_MIN_THROTTLE', settings.PPM_MIN_THROTTLE);
-                googleAnalytics.sendEvent('ESC', 'PPM_MAX_THROTTLE', settings.PPM_MAX_THROTTLE);
+                // googleAnalytics.sendEvent('ESC', 'VERSION', settings.MAIN_REVISION + '.' + settings.SUB_REVISION);
+                // googleAnalytics.sendEvent('ESC', 'LAYOUT', settings.LAYOUT ? settings.LAYOUT.replace(/#/g, '') : `Arm_${settings.LAYOUT_REVISION}`);
+                // googleAnalytics.sendEvent('ESC', 'MODE', settings.MODE ? blheliModeToString(settings.MODE) : null);
+                // googleAnalytics.sendEvent('ESC', 'COMMUTATION_TIMING', settings.COMMUTATION_TIMING);
+                // googleAnalytics.sendEvent('ESC', 'DEMAG_COMPENSATION', settings.DEMAG_COMPENSATION);
+                // googleAnalytics.sendEvent('ESC', 'STARTUP_POWER', settings.STARTUP_POWER);
+                // googleAnalytics.sendEvent('ESC', 'PPM_MIN_THROTTLE', settings.PPM_MIN_THROTTLE);
+                // googleAnalytics.sendEvent('ESC', 'PPM_MAX_THROTTLE', settings.PPM_MAX_THROTTLE);
 
                 if (isSiLabs) {
                     await _4way.reset(esc);
                 }
             } catch (error) {
-                console.log('ESC', esc + 1, 'read settings failed', error.message);
+                console.log('ESC', esc + 1, 'read settings failed', error.message, error);
                 escMetainfo[esc].available = false;
             }
         }
@@ -310,7 +324,7 @@ var Configurator = React.createClass({
                 return;
             }
 
-            const defaults = metainfo.interfaceMode === _4way_modes.ARMBLB ? OPEN_ESC_DEFAULTS[settings.LAYOUT_REVISION] : BLHELI_S_DEFAULTS[settings.LAYOUT_REVISION];
+            const defaults = metainfo.interfaceMode === _4way_modes.ARMBLB ? OPEN_ESC_DEFAULTS[settings.LAYOUT_REVISION] : BLUEJAY_DEFAULTS[settings.LAYOUT_REVISION];
             if (defaults) {
                 for (var settingName in defaults) {
                     if (defaults.hasOwnProperty(settingName)) {
@@ -382,30 +396,31 @@ var Configurator = React.createClass({
         if (!isArm) {
             GUI.log('No need to migrate settings for Open ESC (yet).');
         } else if (newSettings.MODE === escSettings.MODE) {
-            // ensure mode match
-            // find intersection between newSettings and escSettings with respect to their versions
-            for (var prop in newSettings) {
-                if (newSettings.hasOwnProperty(prop) && escSettings.hasOwnProperty(prop) &&
-                    blheliCanMigrate(prop, escSettings, newSettings)) {
-                    newSettings[prop] = escSettings[prop];
-                }
-            }
+            GUI.log('No Bluejay migration');
+            // // ensure mode match
+            // // find intersection between newSettings and escSettings with respect to their versions
+            // for (var prop in newSettings) {
+            //     if (newSettings.hasOwnProperty(prop) && escSettings.hasOwnProperty(prop) &&
+            //         blheliCanMigrate(prop, escSettings, newSettings)) {
+            //         newSettings[prop] = escSettings[prop];
+            //     }
+            // }
 
-            var allSettings = self.state.escSettings.slice();
-            allSettings[escIndex] = newSettings;
-            self.onUserInput(allSettings);
+            // var allSettings = self.state.escSettings.slice();
+            // allSettings[escIndex] = newSettings;
+            // self.onUserInput(allSettings);
 
-            GUI.log(chrome.i18n.getMessage('writeSetupStarted'));
+            // GUI.log(chrome.i18n.getMessage('writeSetupStarted'));
 
-            try {
-                await self.writeSetupImpl(escIndex);
-                GUI.log(chrome.i18n.getMessage('writeSetupFinished'));
-            } catch (error) {
-                GUI.log(chrome.i18n.getMessage('writeSetupFailed', [ error.message ]));
-            }
+            // try {
+            //     await self.writeSetupImpl(escIndex);
+            //     GUI.log(chrome.i18n.getMessage('writeSetupFinished'));
+            // } catch (error) {
+            //     GUI.log(chrome.i18n.getMessage('writeSetupFailed', [ error.message ]));
+            // }
 
-            // read settings back
-            await self.readSetup();
+            // // read settings back
+            // await self.readSetup();
         } else {
             GUI.log('Will not write settings back due to different MODE\n');
 
@@ -887,7 +902,9 @@ var Configurator = React.createClass({
                 case _4way_modes.SiLC2:
                     return BLHELI_SILABS_FLASH_SIZE;
                 case _4way_modes.SiLBLB: {
-                    MCU = findMCU(signature, this.state.supportedBlheliESCs.signatures[BLHELI_TYPES.BLHELI_S_SILABS]) || findMCU(signature, this.state.supportedBlheliESCs.signatures.SiLabs);
+                    MCU = findMCU(signature, this.state.supportedBluejayESCs.signatures[BLUEJAY_TYPES.EFM8]) || 
+                          findMCU(signature, this.state.supportedBlheliESCs.signatures[BLHELI_TYPES.BLHELI_S_SILABS]) || 
+                          findMCU(signature, this.state.supportedBlheliESCs.signatures.SiLabs);
 
                     break;
                 }
@@ -1012,7 +1029,8 @@ var Configurator = React.createClass({
         });
     },
     render: function() {
-        if (!this.state.supportedBlheliESCs || !this.state.supportedOpenEscESCs || !this.state.blheliFirmwareVersions || !this.state.openEscFirmwareVersions) return null;
+        if (!this.state.supportedBlheliESCs || !this.state.supportedBluejayESCs || !this.state.supportedOpenEscESCs || 
+            !this.state.blheliFirmwareVersions || !this.state.bluejayFirmwareVersions || !this.state.openEscFirmwareVersions) return null;
 
         return (
             <div className="tab-esc toolbar_fixed_bottom">
@@ -1111,8 +1129,10 @@ var Configurator = React.createClass({
                 </div>,
                 <FirmwareSelector
                     supportedBlheliESCs={this.state.supportedBlheliESCs}
+                    supportedBluejayESCs={this.state.supportedBluejayESCs}
                     supportedOpenEscESCs={this.state.supportedOpenEscESCs}
                     blheliFirmwareVersions={this.state.blheliFirmwareVersions}
+                    bluejayFirmwareVersions={this.state.bluejayFirmwareVersions}
                     openEscFirmwareVersions={this.state.openEscFirmwareVersions}
                     signatureHint={firstAvailableMetainfo.signature}
                     escHint={firstAvailableEsc.LAYOUT}
@@ -1141,6 +1161,7 @@ var Configurator = React.createClass({
                 escMetainfo={this.state.escMetainfo}
                 supportedBlheliESCs={this.state.supportedBlheliESCs}
                 supportedOpenEscESCs={this.state.supportedOpenEscESCs}
+                supportedBluejayESCs={this.state.supportedBluejayESCs}
                 onUserInput={this.onUserInput}
             />
         );
@@ -1157,6 +1178,7 @@ var Configurator = React.createClass({
                     escSettings={this.state.escSettings}
                     escMetainfo={this.state.escMetainfo}
                     supportedBlheliESCs={this.state.supportedBlheliESCs}
+                    supportedBluejayESCs={this.state.supportedBluejayESCs}
                     supportedOpenEscESCs={this.state.supportedOpenEscESCs}
                     onUserInput={this.onUserInput}
                     canFlash={!this.state.isFlashing}

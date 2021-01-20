@@ -35,7 +35,7 @@ var CommonSettings = React.createClass({
         const availableSettings = this.props.escSettings.filter((i, idx) => this.props.escMetainfo[idx].available);
 
 		const masterSettings = availableSettings[0],
-			settingsDescriptions = masterMetainfo.interfaceMode === _4way_modes.ARMBLB ? OPEN_ESC_SETTINGS_DESCRIPTIONS : BLHELI_SETTINGS_DESCRIPTIONS;
+			settingsDescriptions = masterMetainfo.interfaceMode === _4way_modes.ARMBLB ? OPEN_ESC_SETTINGS_DESCRIPTIONS : BLUEJAY_SETTINGS_DESCRIPTIONS;
 
         // ensure all ESCs have supported firmware version
         for (let i = 0; i < availableSettings.length; ++i) {

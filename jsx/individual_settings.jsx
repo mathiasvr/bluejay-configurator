@@ -28,6 +28,8 @@ var IndividualSettings = React.createClass({
                 make = this.props.supportedBlheliESCs.layouts[BLHELI_TYPES.SILABS][layout].name;
             } else if (layout in this.props.supportedBlheliESCs.layouts[BLHELI_TYPES.BLHELI_S_SILABS]) {
                 make = this.props.supportedBlheliESCs.layouts[BLHELI_TYPES.BLHELI_S_SILABS][layout].name
+            } else if (layout in this.props.supportedBluejayESCs.layouts[BLUEJAY_TYPES.EFM8]) {
+                make = this.props.supportedBluejayESCs.layouts[BLUEJAY_TYPES.EFM8][layout].name
             }
         } else if (escMetainfo.interfaceMode === _4way_modes.ARMBLB) {
 			// No ESC layouts for ARM (Open ESC)
@@ -47,7 +49,7 @@ var IndividualSettings = React.createClass({
 
         var rows = [];
 
-		const settingsDescriptions = metainfo.interfaceMode === _4way_modes.ARMBLB ? OPEN_ESC_INDIVIDUAL_SETTINGS_DESCRIPTIONS : BLHELI_INDIVIDUAL_SETTINGS_DESCRIPTIONS;
+		const settingsDescriptions = metainfo.interfaceMode === _4way_modes.ARMBLB ? OPEN_ESC_INDIVIDUAL_SETTINGS_DESCRIPTIONS : BLUEJAY_INDIVIDUAL_SETTINGS_DESCRIPTIONS;
 
 
         // Check that the layout revision is valid
