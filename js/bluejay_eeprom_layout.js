@@ -34,7 +34,7 @@ var BLHELI_LAYOUT = {
     SUB_REVISION:               {   offset: 0x01, size: 1   },
     LAYOUT_REVISION:            {   offset: 0x02, size: 1   },
     P_GAIN:                     {   offset: 0x03, size: 1   },
-    I_GAIN:                     {   offset: 0x04, size: 1   },
+    STARTUP_BOOST:              {   offset: 0x04, size: 1   }, // TODO: not final
     GOVERNOR_MODE:              {   offset: 0x05, size: 1   },
     LOW_VOLTAGE_LIMIT:          {   offset: 0x06, size: 1   },
     MOTOR_GAIN:                 {   offset: 0x07, size: 1   },

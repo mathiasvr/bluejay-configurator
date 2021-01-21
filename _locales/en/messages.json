@@ -211,6 +211,9 @@
     "escStartupPower": {
         "message": "Startup Power"
     },
+    "escStartupBoost": {
+        "message": "Startup Boost"
+    },
     "escTemperatureProtection": {
         "message": "Temperature Protection"
     },

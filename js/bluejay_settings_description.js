@@ -13,6 +13,7 @@ var BLUEJAY_SETTINGS_LAYOUT_0 = [
         ],
         label: 'escStartupPower'
     },
+    { name: 'STARTUP_BOOST', type: 'number', min: 0, max: 12, step: 1, label: 'escStartupBoost' },
     {
         name: 'TEMPERATURE_PROTECTION', type: 'enum', label: 'escTemperatureProtection',
         options: [

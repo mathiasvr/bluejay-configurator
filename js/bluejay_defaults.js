@@ -12,6 +12,8 @@ var BLUEJAY_DEFAULTS = {
 		TEMPERATURE_PROTECTION:     7,
 		LOW_RPM_POWER_PROTECTION:   1,
 		BRAKE_ON_STOP:              0,
-		LED_CONTROL:                0
+		LED_CONTROL:                0,
+
+		STARTUP_BOOST:              1,
 	}
 };
