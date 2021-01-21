@@ -66,11 +66,6 @@ var BLUEJAY_SETTINGS_DESCRIPTIONS = {
             base: BLUEJAY_SETTINGS_LAYOUT_0
         }
     },
-    '33': {
-        MULTI: {
-            base: BLUEJAY_SETTINGS_LAYOUT_0
-        }
-    },
 };
 
 var BLUEJAY_INDIVIDUAL_SETTINGS = [
@@ -85,9 +80,6 @@ var BLUEJAY_INDIVIDUAL_SETTINGS = [
 
 var BLUEJAY_INDIVIDUAL_SETTINGS_DESCRIPTIONS = {
     '0': {
-        base: BLUEJAY_INDIVIDUAL_SETTINGS
-    },
-    '33': {
         base: BLUEJAY_INDIVIDUAL_SETTINGS
     },
 };
