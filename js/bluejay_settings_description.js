@@ -57,7 +57,10 @@ var BLUEJAY_SETTINGS_LAYOUT_0 = [
             { value: '3', label: '5 minutes' }, { value: '4', label: '10 minutes' },
             { value: '5', label: 'Infinite' }
         ]
-    }
+    },
+    {
+        name: 'STARTUP_BEEP', type: 'bool', label: 'escStartupBeep'
+    },
 ];
 
 var BLUEJAY_SETTINGS_DESCRIPTIONS = {

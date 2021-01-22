@@ -217,6 +217,9 @@
     "escStartupBoost": {
         "message": "Startup Boost"
     },
+    "escStartupBeep": {
+        "message": "Startup Beep Melody"
+    },
     "escTemperatureProtection": {
         "message": "Temperature Protection"
     },
