@@ -3,15 +3,15 @@
 var BLUEJAY_SETTINGS_LAYOUT_0 = [
     {
         name: 'STARTUP_POWER', type: 'enum', options: [
-            { value: '1', label: '0.031' }, { value: '2', label: '0.047' },
-            { value: '3', label: '0.063' }, { value: '4', label: '0.094' },
-            { value: '5', label: '0.125' }, { value: '6', label: '0.188' },
-            { value: '7', label: '0.25' }, { value: '8', label: '0.38' },
-            { value: '9', label: '0.50' }, { value: '10', label: '0.75' },
-            { value: '11', label: '1.00' }, { value: '12', label: '1.25' },
-            { value: '13', label: '1.50' }
+            { value:  '1', label:  '0.39 % (0.031)' }, { value:  '2', label:  '0.78 % (0.047)' },
+            { value:  '3', label:  '1.18 % (0.063)' }, { value:  '4', label:  '1.57 % (0.094)' },
+            { value:  '5', label:  '2.35 % (0.125)' }, { value:  '6', label:  '3.53 % (0.188)' },
+            { value:  '7', label:  '4.71 %  (0.25)' }, { value:  '8', label:  '7.06 %  (0.38)' },
+            { value:  '9', label:  '9.80 %  (0.50)' }, { value: '10', label: '14.51 %  (0.75)' },
+            { value: '11', label: '19.61 %  (1.00)' }, { value: '12', label: '24.31 %  (1.25)' },
+            { value: '13', label: '29.41 %  (1.50)' }
         ],
-        label: 'escStartupPower'
+        label: 'escRampupPower'
     },
     { name: 'STARTUP_BOOST', type: 'number', min: 0, max: 12, step: 1, label: 'escStartupBoost' },
     {
@@ -39,9 +39,9 @@ var BLUEJAY_SETTINGS_LAYOUT_0 = [
     {
         name: 'COMMUTATION_TIMING', type: 'enum', label: 'escMotorTiming',
         options: [
-            { value: '1', label: 'Low' }, { value: '2', label: 'MediumLow' },
-            { value: '3', label: 'Medium' }, { value: '4', label: 'MediumHigh' },
-            { value: '5', label: 'High' }
+            { value: '1', label: '0° (Low)' }, { value: '2', label: '7.5° (MediumLow)' },
+            { value: '3', label: '15° (Medium)' }, { value: '4', label: '22.5° (MediumHigh)' },
+            { value: '5', label: '30° (High)' }
         ]
     },
     {

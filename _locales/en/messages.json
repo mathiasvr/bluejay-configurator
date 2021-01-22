@@ -211,6 +211,9 @@
     "escStartupPower": {
         "message": "Startup Power"
     },
+    "escRampupPower": {
+        "message": "Rampup Power"
+    },
     "escStartupBoost": {
         "message": "Startup Boost"
     },
