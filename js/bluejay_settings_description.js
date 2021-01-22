@@ -45,10 +45,10 @@ var BLUEJAY_SETTINGS_LAYOUT_0 = [
         ]
     },
     {
-        name: 'BEEP_STRENGTH', type: 'number', min: 1, max: 255, step: 1, label: 'escBeepStrength'
+        name: 'BEEP_STRENGTH', type: 'number', min: 0, max: 255, step: 1, label: 'escBeepStrength'
     },
     {
-        name: 'BEACON_STRENGTH', type: 'number', min: 1, max: 255, step: 1, label: 'escBeaconStrength'
+        name: 'BEACON_STRENGTH', type: 'number', min: 0, max: 255, step: 1, label: 'escBeaconStrength'
     },
     {
         name: 'BEACON_DELAY', type: 'enum', label: 'escBeaconDelay',
