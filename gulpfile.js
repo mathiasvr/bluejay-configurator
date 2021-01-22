@@ -101,7 +101,7 @@ function getRunDebugAppCommand() {
 }
 
 function get_release_filename(platform, ext) {
-    return 'BLHeli-Configurator_' + platform + '_' + pkg.version + '.' + ext;
+    return 'Bluejay-Configurator_' + platform + '_' + pkg.version + '.' + ext;
 }
 
 // -----------------
@@ -330,7 +330,7 @@ function release(arch) {
     archive.on('warning', function (err) { throw err; });
     archive.on('error', function (err) { throw err; });
     archive.pipe(output);
-    archive.directory(src, 'BLHeli Configurator');
+    archive.directory(src, 'Bluejay Configurator');
     return archive.finalize();
 }
 
@@ -357,10 +357,10 @@ function release_osx64() {
             target: path.join(releaseDir, get_release_filename('macOS', 'dmg')),
             basepath: path.join(appsDir, pkg.name, 'osx64'),
             specification: {
-                title: 'BLHeli Configurator',
+                title: 'Bluejay Configurator',
                 contents: [
                     { 'x': 448, 'y': 342, 'type': 'link', 'path': '/Applications' },
-                    { 'x': 192, 'y': 344, 'type': 'file', 'path': pkg.name + '.app', 'name': 'BLHeli Configurator.app' }
+                    { 'x': 192, 'y': 344, 'type': 'file', 'path': pkg.name + '.app', 'name': 'Bluejay Configurator.app' }
                 ],
                 background: path.join(__dirname, 'images/dmg-background.png'),
                 format: 'UDZO',
