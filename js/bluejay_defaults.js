@@ -15,5 +15,7 @@ var BLUEJAY_DEFAULTS = {
 		LED_CONTROL:                0,
 
 		STARTUP_BOOST:              1,
+		STARTUP_BEEP:               1,
+		DITHERING:                  1,
 	}
 };

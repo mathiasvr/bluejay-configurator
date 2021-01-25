@@ -220,6 +220,9 @@
     "escStartupBeep": {
         "message": "Startup Beep Melody"
     },
+    "escDithering": {
+        "message": "Enable Dithering"
+    },
     "escTemperatureProtection": {
         "message": "Temperature Protection"
     },

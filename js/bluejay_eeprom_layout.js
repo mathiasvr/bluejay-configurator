@@ -36,7 +36,7 @@ var BLHELI_LAYOUT = {
     P_GAIN:                     {   offset: 0x03, size: 1   },
     STARTUP_BOOST:              {   offset: 0x04, size: 1   }, // TODO: not final
     STARTUP_BEEP:               {   offset: 0x05, size: 1   },
-    LOW_VOLTAGE_LIMIT:          {   offset: 0x06, size: 1   },
+    DITHERING:                  {   offset: 0x06, size: 1   },
     MOTOR_GAIN:                 {   offset: 0x07, size: 1   },
     MOTOR_IDLE:                 {   offset: 0x08, size: 1   },
     STARTUP_POWER:              {   offset: 0x09, size: 1   },

@@ -61,6 +61,9 @@ var BLUEJAY_SETTINGS_LAYOUT_0 = [
     {
         name: 'STARTUP_BEEP', type: 'bool', label: 'escStartupBeep'
     },
+    {
+        name: 'DITHERING', type: 'bool', label: 'escDithering'
+    },
 ];
 
 var BLUEJAY_SETTINGS_DESCRIPTIONS = {
