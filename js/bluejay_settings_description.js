@@ -13,7 +13,16 @@ var BLUEJAY_SETTINGS_LAYOUT_0 = [
         ],
         label: 'escRampupPower'
     },
-    { name: 'STARTUP_BOOST', type: 'number', min: 0, max: 12, step: 1, label: 'escStartupBoost' },
+    //{ name: 'STARTUP_BOOST', type: 'number', min: 0, max: 12, step: 1, label: 'escStartupBoost' },
+    {
+        name: 'STARTUP_BOOST', type: 'enum', options: [
+            { value:  '0', label:  'Off' }, { value:  '1', label:  '+15' },
+            { value:  '2', label:  '+30' }, { value:  '3', label:  '+60' },
+            { value:  '4', label:  '+120' }
+        ],
+        label: 'escStartupBoost'
+    },
+
     {
         name: 'TEMPERATURE_PROTECTION', type: 'enum', label: 'escTemperatureProtection',
         options: [
