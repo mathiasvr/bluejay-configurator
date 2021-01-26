@@ -176,8 +176,16 @@ var FirmwareSelector = React.createClass({
                 return;
             }
 
+            let support
+            if (this.state.type === BLUEJAY_TYPES.EFM8) {
+                // todo: for some reason react is hiding Number
+                const cv = chrome.runtime.getManifest().version.split('.').map(v => parseInt(v, 10)) 
+                const ev = version.configurator.split('.').map(v => parseInt(v, 10))
+                support = cv.reduce((b, v, i) => v >= ev[i] && b, true)
+            }
+
             options.push(
-                <option value={idx}>{version.name}</option>
+                <option value={idx} disabled={!support}>{support ? version.name : version.name + ' (Update Configurator)'}</option>
             );
         });
 
