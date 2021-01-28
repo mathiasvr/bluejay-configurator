@@ -215,7 +215,7 @@
         "message": "Rampup Start Power"
     },
     "escStartupBoost": {
-        "message": "Startup Boost"
+        "message": "Minimum Startup Power"
     },
     "escStartupBeep": {
         "message": "Startup Beep Melody"

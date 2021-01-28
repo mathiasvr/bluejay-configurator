@@ -75,7 +75,8 @@ var Number = React.createClass({
     },
     getDisplayValue: function() {
         if (this.props.offset || this.props.factor) {
-            return this.props.factor * (this.props.value || 1) + (this.props.offset || 0);
+            // TODO: round because that's what it needed
+            return Math.round(this.props.factor * (this.props.value || 0) + (this.props.offset || 0));
         }
 
         return this.props.value;

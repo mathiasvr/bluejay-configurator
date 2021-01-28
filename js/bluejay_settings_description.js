@@ -6,12 +6,12 @@ var BLUEJAY_SETTINGS_DESCRIPTIONS = {
     // todo: remove multi
     '200': { // v0.9
         MULTI: {
-            base: 
+            base:
             [
                 {
                     name: 'STARTUP_POWER', type: 'enum', options: [
-                        { value:  '1', label: '0.5% (0.031)' }, 
-                        // { value:  '2', label: '0.8% (0.047)' }, { value:  '3', label: '1.2% (0.063)' }, 
+                        { value:  '1', label: '0.5% (0.031)' },
+                        // { value:  '2', label: '0.8% (0.047)' }, { value:  '3', label: '1.2% (0.063)' },
                         // { value:  '4', label: '1.6% (0.094)' }, { value:  '5', label: '2.5% (0.125)' },
                         // { value:  '6', label: '3.5% (0.188)' },
                         { value:  '7', label:   '5%  (0.25)' }, { value:  '8', label:   '7%  (0.38)' },
@@ -21,17 +21,10 @@ var BLUEJAY_SETTINGS_DESCRIPTIONS = {
                     ],
                     label: 'escRampupPower'
                 },
-                //{ name: 'STARTUP_BOOST', type: 'number', min: 0, max: 12, step: 1, label: 'escStartupBoost' },
                 {
-                    name: 'STARTUP_BOOST', type: 'enum', options: [
-                        { value: '0', label:  'Off' }, { value: '1', label:  '+1%' },
-                        { value: '2', label:  '+2%' }, { value: '3', label:  '+3%' },
-                        { value: '4', label:  '+5%' }, { value: '5', label:  '+7%' },
-                        { value: '6', label: '+10%' }, { value: '7', label: '+15%' }
-                    ],
-                    label: 'escStartupBoost'
+                    name: 'STARTUP_BOOST', type: 'number',label: 'escStartupBoost', 
+                    min: 1000, max: 1125, step: 5, displayFactor: 1000 / 2047, displayOffset: 1000
                 },
-            
                 {
                     name: 'TEMPERATURE_PROTECTION', type: 'enum', label: 'escTemperatureProtection',
                     options: [

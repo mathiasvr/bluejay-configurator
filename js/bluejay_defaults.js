@@ -1,7 +1,7 @@
 'use strict';
 
 var BLUEJAY_DEFAULTS = {
-	'0': {
+	'200': {
 		STARTUP_POWER:              9,
 		MOTOR_DIRECTION:            1,
 		COMMUTATION_TIMING:         3,
@@ -14,7 +14,7 @@ var BLUEJAY_DEFAULTS = {
 		BRAKE_ON_STOP:              0,
 		LED_CONTROL:                0,
 
-		STARTUP_BOOST:              1,
+		STARTUP_BOOST:              51,
 		STARTUP_BEEP:               1,
 		DITHERING:                  1,
 	},
