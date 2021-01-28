@@ -4,7 +4,7 @@ var BLUEJAY_DEFAULTS = {
 	'200': {
 		STARTUP_POWER:              9,
 		MOTOR_DIRECTION:            1,
-		COMMUTATION_TIMING:         3,
+		COMMUTATION_TIMING:         4,
 		BEEP_STRENGTH:              40,
 		BEACON_STRENGTH:            80,
 		BEACON_DELAY:               4,
