@@ -212,7 +212,7 @@
         "message": "Startup Power"
     },
     "escRampupPower": {
-        "message": "Rampup Power"
+        "message": "Rampup Start Power"
     },
     "escStartupBoost": {
         "message": "Startup Boost"
