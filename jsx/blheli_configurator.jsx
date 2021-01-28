@@ -396,34 +396,33 @@ var Configurator = React.createClass({
         // migrate settings from previous version if asked to
         const newSettings = blheliSettingsObject(settingsArray, layout);
 
-        if (!isArm) {
+        if (isArm) {
             GUI.log('No need to migrate settings for Open ESC (yet).');
         } else if (newSettings.MODE === escSettings.MODE) {
-            GUI.log('No Bluejay migration');
-            // // ensure mode match
-            // // find intersection between newSettings and escSettings with respect to their versions
-            // for (var prop in newSettings) {
-            //     if (newSettings.hasOwnProperty(prop) && escSettings.hasOwnProperty(prop) &&
-            //         blheliCanMigrate(prop, escSettings, newSettings)) {
-            //         newSettings[prop] = escSettings[prop];
-            //     }
-            // }
+            // ensure mode match
+            // find intersection between newSettings and escSettings with respect to their versions
+            for (var prop in newSettings) {
+                if (newSettings.hasOwnProperty(prop) && escSettings.hasOwnProperty(prop) &&
+                    bluejayCanMigrate(prop, escSettings, newSettings)) {
+                    newSettings[prop] = escSettings[prop];
+                }
+            }
 
-            // var allSettings = self.state.escSettings.slice();
-            // allSettings[escIndex] = newSettings;
-            // self.onUserInput(allSettings);
+            var allSettings = self.state.escSettings.slice();
+            allSettings[escIndex] = newSettings;
+            self.onUserInput(allSettings);
 
-            // GUI.log(chrome.i18n.getMessage('writeSetupStarted'));
+            GUI.log(chrome.i18n.getMessage('writeSetupStarted'));
 
-            // try {
-            //     await self.writeSetupImpl(escIndex);
-            //     GUI.log(chrome.i18n.getMessage('writeSetupFinished'));
-            // } catch (error) {
-            //     GUI.log(chrome.i18n.getMessage('writeSetupFailed', [ error.message ]));
-            // }
+            try {
+                await self.writeSetupImpl(escIndex);
+                GUI.log(chrome.i18n.getMessage('writeSetupFinished'));
+            } catch (error) {
+                GUI.log(chrome.i18n.getMessage('writeSetupFailed', [ error.message ]));
+            }
 
-            // // read settings back
-            // await self.readSetup();
+            // read settings back
+            await self.readSetup();
         } else {
             GUI.log('Will not write settings back due to different MODE\n');
 
