@@ -1,5 +1,10 @@
 'use strict';
 
+// todo: laziness...
+function hacks (text) {
+    return text.startsWith('_') ? text.slice(1) : chrome.i18n.getMessage(text)
+}
+
 var Checkbox = React.createClass({
     render: function() {
         return (
@@ -11,7 +16,7 @@ var Checkbox = React.createClass({
                         checked={this.props.value === 1 ? true : false}
                         onChange={this.handleChange}
                     />
-                    <span className={this.props.notInSync ? "not-in-sync" : ""}>{chrome.i18n.getMessage(this.props.label)}</span>
+                    <span className={this.props.notInSync ? "not-in-sync" : ""}>{hacks(this.props.label)}</span>
                 </label>
             </div>
         );
@@ -36,7 +41,7 @@ var Select = React.createClass({
                             this.props.options.map(option => <option value={option.value}>{option.label}</option>)
                         }
                     </select>
-                    <span className={this.props.notInSync ? "not-in-sync" : ""}>{chrome.i18n.getMessage(this.props.label)}</span>
+                    <span className={this.props.notInSync ? "not-in-sync" : ""}>{hacks(this.props.label)}</span>
                 </label>
             </div>
         );
@@ -61,7 +66,7 @@ var Number = React.createClass({
                         labelSuffix={this.props.suffix}
                         onChange={this.handleChange}
                     />
-                    <span className={this.props.notInSync ? "not-in-sync label" : "label"}>{chrome.i18n.getMessage(this.props.label)}</span>
+                    <span className={this.props.notInSync ? "not-in-sync label" : "label"}>{hacks(this.props.label)}</span>
                 </label>
             </div>
         );
