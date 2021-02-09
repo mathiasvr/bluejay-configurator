@@ -124,6 +124,7 @@ var CommonSettings = React.createClass({
                         max={desc.max}
 						factor={desc.displayFactor}
 						offset={desc.displayOffset}
+                        round={desc.displayPrecision}
                         value={settings[desc.name]}
                         label={desc.label}
                         notInSync={notInSync}

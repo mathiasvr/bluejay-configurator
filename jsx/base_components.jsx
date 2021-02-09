@@ -74,11 +74,15 @@ var Number = React.createClass({
         this.props.onChange(component.props.name, value);
     },
     getDisplayValue: function() {
+        let val = this.props.value || 0
         if (this.props.offset || this.props.factor) {
-            // TODO: round because that's what it needed
-            return Math.round(this.props.factor * (this.props.value || 0) + (this.props.offset || 0));
+            val = (this.props.factor || 1) * val + (this.props.offset || 0);
         }
-
-        return this.props.value;
+        if (this.props.round != null) {
+            // TODO: Number() is overridden by React for some reason :(
+            //val = this.props.round === 0 ? Math.round(val) : Number(val).toPrecision(this.props.round)
+            val = Math.round(val)
+        }
+        return val;
     }
 });

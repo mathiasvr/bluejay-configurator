@@ -23,7 +23,7 @@ var BLUEJAY_SETTINGS_DESCRIPTIONS = {
                 },
                 {
                     name: 'STARTUP_BOOST', type: 'number',label: 'escStartupBoost', 
-                    min: 1000, max: 1125, step: 5, displayFactor: 1000 / 2047, displayOffset: 1000
+                    min: 1000, max: 1125, step: 5, displayFactor: 1000 / 2047, displayOffset: 1000, displayPrecision: 0
                 },
                 {
                     name: 'TEMPERATURE_PROTECTION', type: 'enum', label: 'escTemperatureProtection',
