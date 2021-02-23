@@ -4,7 +4,7 @@ var Debug = {
     enabled: false,
 
     getDummySettings: function(type) {
-        var ret = blheliSettingsObject(new Uint8Array(BLHELI_LAYOUT_SIZE).fill(0xFF));
+        var ret = blheliSettingsObject(new Uint8Array(BLHELI_LAYOUT_SIZE).fill(0xFF), BLHELI_LAYOUT);
 
         switch (type) {
             case BLHELI_TYPES.BLHELI_S_SILABS: {
