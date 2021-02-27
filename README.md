@@ -27,7 +27,7 @@ You can submit pull requests to js/blheli_versions.json and js/blheli_escs.json 
 
 ### Standalone
 
-Download the appropriate installer for your platform from [Releases](https://github.com/blheli-configurator/blheli-configurator/releases).
+Download the appropriate installer for your platform from [Releases](https://github.com/mathiasvr/bluejay-configurator/releases).
 
 ### Via Chrome Web Store
 
@@ -66,7 +66,7 @@ List of possible values of `<task-name>`:
 * **dist** copies all the JS and CSS files in the `./dist` folder.
 * **apps** builds the apps in the `./apps` folder [1].
 * **debug** builds debug version of the apps in the `./debug` folder [1].
-* **release** zips up the apps into individual archives in the `./release` folder [1]. 
+* **release** zips up the apps into individual archives in the `./release` folder [1].
 
 [1] Running this task on macOS or Linux requires Wine, since it's needed to set the icon for the Windows app (build for specific platform to avoid errors).
 
