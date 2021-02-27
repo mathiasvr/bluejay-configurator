@@ -1,4 +1,6 @@
 'use strict';
+const settings = require('./settings.json');
+const { ga } = settings;
 
 function debounce(func, wait, immediate) {
     // 'private' variable for instance
@@ -9,18 +11,18 @@ function debounce(func, wait, immediate) {
     // Calling debounce returns a new anonymous function
     return function() {
         // reference the context and args for the setTimeout function
-        var context = this, 
+        var context = this,
             args = arguments;
 
         // Should the function be called now? If immediate is true
         //   and not already in a timeout then the answer is: Yes
         var callNow = immediate && !timeout;
 
-        // This is the basic debounce behaviour where you can call this 
-        //   function several times, but it will only execute once 
-        //   [before or after imposing a delay]. 
+        // This is the basic debounce behaviour where you can call this
+        //   function several times, but it will only execute once
+        //   [before or after imposing a delay].
         //   Each time the returned function is called, the timer starts over.
-        clearTimeout(timeout);   
+        clearTimeout(timeout);
 
         // Set the new timeout
         timeout = setTimeout(function() {
@@ -32,7 +34,7 @@ function debounce(func, wait, immediate) {
              // Check if the function already ran with the immediate flag
              if (!immediate) {
                // Call the original function with apply
-               // apply lets you define the 'this' object as well as the arguments 
+               // apply lets you define the 'this' object as well as the arguments
                //    (both captured before setTimeout)
                func.apply(context, args);
              }
@@ -40,7 +42,7 @@ function debounce(func, wait, immediate) {
 
         // Immediate mode and no wait timer? Execute the function..
         if (callNow) func.apply(context, args);
-     }; 
+     };
 }
 
 // Fast way to log possible errors and uncaught exceptions
@@ -97,8 +99,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
 };
 
 // Google Analytics
-var googleAnalyticsService = analytics.getService('ice_cream_app');
-var googleAnalytics = googleAnalyticsService.getTracker(atob('VUEtODI2MzQzMzUtMQ=='));
+var googleAnalyticsService = analytics.getService(ga.service);
+var googleAnalytics = googleAnalyticsService.getTracker(ga.tid);
 var googleAnalyticsConfig = false;
 googleAnalyticsService.getConfig().addCallback(function (config) {
     googleAnalyticsConfig = config;
@@ -131,7 +133,7 @@ $(document).ready(function () {
         case 'UNIX':
             break;
     }
-     
+
     chrome.storage.local.get('logopen', function (result) {
         if (result.logopen) {
             $("#showlog").trigger('click');
@@ -148,20 +150,20 @@ $(document).ready(function () {
                 tabClass = $(self).parent().prop('class');
 
             var tabRequiresConnection = $(self).parent().hasClass('mode-connected');
-            
+
             var tab = tabClass.substring(4);
             var tabName = $(self).text();
-            
+
             if (tabRequiresConnection && !CONFIGURATOR.connectionValid) {
                 GUI.log(chrome.i18n.getMessage('tabSwitchConnectionRequired'));
                 return;
             }
-            
+
             if (GUI.connect_lock) { // tab switching disabled while operation is in progress
                 GUI.log(chrome.i18n.getMessage('tabSwitchWaitForOperation'));
                 return;
             }
-            
+
             if (GUI.allowedTabs.indexOf(tab) < 0) {
                 GUI.log(chrome.i18n.getMessage('tabSwitchUpgradeRequired', [tabName]));
                 return;
@@ -341,7 +343,7 @@ $(document).ready(function () {
             }
         }
     });
-    
+
     $("#showlog").on('click', function() {
     var state = $(this).data('state');
     if ( state ) {
@@ -354,7 +356,7 @@ $(document).ready(function () {
         $(".tab_container").removeClass('logopen');
         $("#scrollicon").removeClass('active');
         chrome.storage.local.set({'logopen': false});
-	
+
         state = false;
     }else{
         $("#log").animate({height: 111}, 200);
@@ -370,9 +372,9 @@ $(document).ready(function () {
     $(this).data('state', state);
 
     });
-    
+
     var profile_e = $('select[name="profilechange"]');
-    
+
     profile_e.change(function () {
         var profile = parseInt($(this).val());
         MSP.send_message(MSP_codes.MSP_SELECT_SETTING, [profile], false, function () {
