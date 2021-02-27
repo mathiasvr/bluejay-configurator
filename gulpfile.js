@@ -34,7 +34,7 @@ const nwVersion = '0.50.2';
 // Get platform from commandline args
 // #
 // # gulp <task> [<platform>]+        Run only for platform(s) (with <platform> one of --linux64, --linux32, --osx64, --win32, --win64, or --chromeos)
-// # 
+// #
 function getPlatforms(includeChromeOs) {
     var supportedPlatforms = ['linux64', 'linux32', 'osx64', 'win32', 'win64'];
     var platforms = [];
@@ -51,7 +51,7 @@ function getPlatforms(includeChromeOs) {
             console.log(`Your current platform (${os.platform()}) is not a supported build platform. Please specify platform to build for on the command line.`);
             process.exit();
         }
-    }  
+    }
 
     if (platforms.length === 0) {
         switch (os.platform()) {
@@ -108,44 +108,44 @@ function get_release_filename(platform, ext) {
 // Tasks
 // -----------------
 
-gulp.task('clean', function () { 
+gulp.task('clean', function () {
     return runSequence('clean-dist', 'clean-build-js', 'clean-apps', 'clean-debug', 'clean-release');
 });
 
 gulp.task('clean-dist', clean_dist);
 
 function clean_dist() {
-    return del([distDir + '**'], { force: true }); 
+    return del([distDir + '**'], { force: true });
 };
 
 gulp.task('clean-build-js', function() {
-    return del([jsBuildDir + '*.js'], { force: true }); 
+    return del([jsBuildDir + '*.js'], { force: true });
 });
 
 gulp.task('clean-apps', clean_apps);
 
 function clean_apps() {
-    return del([appsDir + '**'], { force: true }); 
+    return del([appsDir + '**'], { force: true });
 };
 
 gulp.task('clean-debug', clean_debug);
 
 function clean_debug() {
-    return del([debugDir + '**'], { force: true }); 
+    return del([debugDir + '**'], { force: true });
 };
 
 gulp.task('clean-release', clean_release);
 
 function clean_release() {
-    return del([releaseDir + '**'], { force: true }); 
+    return del([releaseDir + '**'], { force: true });
 };
 
-gulp.task('clean-nwjs-cache', function () { 
-    return del(['./cache/**'], { force: true }); 
+gulp.task('clean-nwjs-cache', function () {
+    return del(['./cache/**'], { force: true });
 });
 
-gulp.task('clean-node-modules', function () { 
-    return del(['./node_modules/**'], { force: true }); 
+gulp.task('clean-node-modules', function () {
+    return del(['./node_modules/**'], { force: true });
 });
 
 // Real work for dist task. Done in another task to call it via
@@ -221,6 +221,7 @@ function do_dist() {
         './tabs/landing.js',
 
         // everything else
+        './settings.json',
         './package.json', // For NW.js
         './yarn.lock', // To install the runtime dependencies
         './manifest.json', // For Chrome app
@@ -404,7 +405,7 @@ function do_release(done) {
     if (platforms.indexOf('linux32') !== -1) {
         release('linux32');
     }
-        
+
     if (platforms.indexOf('osx64') !== -1) {
         release_osx64();
     }
@@ -412,7 +413,7 @@ function do_release(done) {
     if (platforms.indexOf('win32') !== -1) {
         release('win32');
     }
-    
+
     if (platforms.indexOf('win64') !== -1) {
         release('win64');
     }
