@@ -174,7 +174,7 @@
 #changelog .wrapper {
     height: 100%;
     padding: 0 20px;
-    border-left: 5px solid blueviolet;
+    border-left: 5px solid #2a84c4;
     overflow-y: auto;
     display: none;
 }
@@ -184,7 +184,7 @@
     top: 50px;
     right: 215px;
     position: absolute;
-    background: blueviolet;
+    background: #2a84c4;
     border-radius: 5px 5px 0 0;
     border-bottom: none;
     height: 30px;

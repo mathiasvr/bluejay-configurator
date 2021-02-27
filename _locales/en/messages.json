@@ -153,7 +153,7 @@
     },
 
     "defaultWelcomeIntro": {
-        "message": "Welcome to <strong>BLHeli - Configurator</strong>, a utility designed to simplify updating and configuring of your ESCs."
+        "message": "Welcome to <strong>Bluejay - Configurator</strong>, a utility designed to simplify updating and configuring of your ESCs."
     },
 
     "defaultWelcomeHead": {

@@ -61,19 +61,19 @@ a.disabled {
     background-image: url(images/icons/cf_icon_info_grey.svg);
     background-size: contain;
     background-position: center;
-    transition: none;  
+    transition: none;
 }
 
 .helpicon:hover {
     opacity: 0.9;
     background-image: url(images/icons/cf_icon_info_green.svg);
-    transition: none;  
+    transition: none;
 }
 
 .cf_doc_version_bt a {
     padding: 1px 9px 1px 9px;
     margin-top: -45px;
-    background-color: #5929aa;
+    background-color: #252177;
     border-radius: 3px;
     border: 1px solid #4c8829;
     color: #fff;
@@ -88,7 +88,7 @@ a.disabled {
 }
 
 .cf_doc_version_bt a:hover {
-    background-color: #6a35c4;
+    background-color: #3f51b5;
     transition: all ease 0.2s;
 }
 
@@ -298,7 +298,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 #log a {
     font-weight: regular;
-    color: #5929aa;
+    color: #252177;
 }
 
 #log a:hover {
@@ -330,7 +330,7 @@ input[type="number"]::-webkit-inner-spin-button {
     float: left;
     height: calc(100% - 150px);
     width: 200px;
-    border-right: 4px solid #5929aa;
+    border-right: 4px solid #252177;
     background-color: #2e2e2e;
     transition: all 0.2s;
 
@@ -399,25 +399,25 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 #tabs li.active a {
-    background-color: #5929aa;
+    background-color: #252177;
     color: #fff;
     transition: none;
 }
 
 #tabs li.active a:hover {
     cursor: default;
-    background-color: #5929aa;
+    background-color: #252177;
 }
 
 #content {
-    margin-top: 0px; 
-    padding: 0px; 
+    margin-top: 0px;
+    padding: 0px;
     height: calc(100% - 150px);
     /*  (port picker 105px, log CLOSED 25px, status bar: 20px + padding) - was: calc(100% - 171px)*/
     background-color: lightgray;
     overflow-x: hidden;
     overflow-y: auto;
-    border: 0px solid #848484; 
+    border: 0px solid #848484;
     -webkit-transform: rotateX(0deg); /* DO NOT REMOVE! this fixes the UI freezing bug on MAC OS X */
     transition: all 0.3s;
 }
@@ -494,7 +494,7 @@ dialog {
 
 /* Tab Title */
 .tab_title {
-    border-bottom: 1px solid #5929aa;
+    border-bottom: 1px solid #252177;
     font-size: 20px;
     line-height: 24px;
     height: 30px;
@@ -543,9 +543,9 @@ dialog {
     margin-top: 0px;
     margin-bottom: 0px;
     margin-right: 20px;
-    background-color: #5929aa;
+    background-color: #125684;
     border-radius: 3px;
-    border: 1px solid #4c2988;
+    border: 1px solid #125684;
     color: #fff;
     float: right;
     font-family: 'open_sansbold', Arial;
@@ -561,12 +561,12 @@ dialog {
 }
 
 .content_toolbar .btn a:hover {
-    background-color: #6a35c4;
+    background-color: #2a84c4;
     transition: all ease 0.2s;
 }
 
 .content_toolbar .btn a:active {
-    background-color: #4d2493;
+    background-color: #125684;
     transition: all ease 0.0s;
     box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.35);
 }
@@ -678,7 +678,7 @@ dialog {
 
 /* Standard GUI BOX */
 .gui_box {
-    border: 1px solid #5929aa;
+    border: 1px solid #252177;
     border-radius: 4px;
     background-color: #FFFFFF;
     float: left;
@@ -722,7 +722,7 @@ dialog {
 }
 
 .gui_box_titlebar {
-    background-color: #5929aa;
+    background-color: #252177;
     border-radius: 3px 3px 0px 0px;
     font-size: 13px;
     width: 100%;
@@ -763,7 +763,7 @@ dialog {
     margin-top: 9px;
     margin-bottom: 0px;
     margin-right: 20px;
-    background-color: #5929aa;
+    background-color: #252177;
     border-radius: 3px;
     border: 1px solid #4c2988;
     color: #fff;
@@ -781,7 +781,7 @@ dialog {
 }
 
 .fixed_band .save_btn a:hover {
-    background-color: #6a35c4;
+    background-color: #3f51b5;
     transition: all ease 0.2s;
 }
 
@@ -799,8 +799,8 @@ dialog {
     text-align: center;
     background-color: #fff;
     border-radius: 4px;
-    border: 1px solid #5929aa;
-    color: #5929aa;
+    border: 1px solid #252177;
+    color: #252177;
     font-family: 'open_sanssemibold', Arial;
     font-size: 12px;
     line-height: 13px;
@@ -816,7 +816,7 @@ dialog {
 }
 
 .default_btn a:hover {
-    background-color: #6a35c4;
+    background-color: #3f51b5;
     color: #fff;
     text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
     transition: all ease 0.2s;
@@ -825,7 +825,7 @@ dialog {
 }
 
 .default_btn a:active {
-    background-color: #4d2493;
+    background-color: #252177;
     transition: all ease 0.0s;
     box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.35);
 }
@@ -855,10 +855,10 @@ dialog {
 }
 
 .small a:hover {
-    background-color: #6a35c4;
+    background-color: #3f51b5;
     color: #fff;
     text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
-    border: 1px solid #5929aa;
+    border: 1px solid #252177;
     transition: all ease 0.2s;
 }
 
@@ -869,15 +869,15 @@ dialog {
 }
 
 .green a {
-    background-color: #5929aa;
+    background-color: #252177;
     text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
     color: #fff;
-    border: 1px solid #5929aa;
+    border: 1px solid #252177;
     transition: all ease 0.2s;
 }
 
 .green a:hover {
-    background-color: #6a35c4;
+    background-color: #3f51b5;
     border: 1px solid #4d9324;
     text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
     color: #fff;
@@ -919,7 +919,7 @@ dialog {
 }
 
 .gps_true {
-    background-color: #5929aa;
+    background-color: #252177;
     padding: 1px 7px 2px 7px;
     border-radius: 3px;
     color: #FFFFFF;
@@ -955,8 +955,8 @@ dialog {
 }
 
 .connect_b a.connect {
-    background-color: #561dac;
-    border: 1px solid #5b1bbb;
+    background-color: #2a84c4;
+    border: 1px solid #125684;
     background-image: url(images/icons/cf_icon_usb2_white.svg);
     background-repeat: no-repeat;
     background-size: 44px;
@@ -965,7 +965,7 @@ dialog {
 }
 
 .connect_b a.connect:hover {
-    background-color: #682ec0;
+    background-color: #125684;
 }
 
 .connect_b a.connect.active {
@@ -1144,5 +1144,5 @@ input {
     overflow-x: hidden;
     overflow-y: auto;
 }
-    
+
 }
