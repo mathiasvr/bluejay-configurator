@@ -216,7 +216,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    border: 1px solid #5929aa;
+    border: 1px solid #252177;
     border-radius: 5px;
 }
 
@@ -226,7 +226,7 @@
 }
 
 .tab-esc .flash_btn .progress::-webkit-progress-value {
-    background: #5929aa;
+    background: #252177;
     /*border-radius: 5px;*/
 }
 
