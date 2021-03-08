@@ -1,6 +1,25 @@
 'use strict';
 
 var BLUEJAY_DEFAULTS = {
+	'202': { // only adds damping mode
+		RPM_POWER_SLOPE:            9,
+		MOTOR_DIRECTION:            1,
+		COMMUTATION_TIMING:         4,
+		BEEP_STRENGTH:              40,
+		BEACON_STRENGTH:            80,
+		BEACON_DELAY:               4,
+		DEMAG_COMPENSATION:         2,
+		TEMPERATURE_PROTECTION:     7,
+		BRAKE_ON_STOP:              0,
+		LED_CONTROL:                0,
+
+		STARTUP_POWER_MIN:          51,
+		STARTUP_BEEP:               1,
+		DITHERING:                  1,
+
+		STARTUP_POWER_MAX:          25,
+		DAMPING_MODE:               2,
+	},
 	'201': { // v0.10
 		RPM_POWER_SLOPE:            9,
 		MOTOR_DIRECTION:            1,

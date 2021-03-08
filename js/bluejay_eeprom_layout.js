@@ -46,7 +46,7 @@ var BLHELI_LAYOUT = {
     MODE:                       {   offset: 0x0D, size: 2   },
 
     _PROGRAMMING_BY_TX:         {   offset: 0x0F, size: 1   },
-    __REARM_AT_START:           {   offset: 0x10, size: 1   },
+    DAMPING_MODE:               {   offset: 0x10, size: 1   },
     __GOVERNOR_SETUP_TARGET:    {   offset: 0x11, size: 1   },
     __STARTUP_RPM:              {   offset: 0x12, size: 1   },
     __STARTUP_ACCELERATION:     {   offset: 0x13, size: 1   },
