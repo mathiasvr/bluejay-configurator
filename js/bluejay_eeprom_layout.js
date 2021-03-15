@@ -23,7 +23,7 @@ var BLHELI_SILABS_BOOTLOADER_SIZE       = 0x0200
 var BLHELI_SILABS_FLASH_SIZE            = 0x2000
 var BLHELI_SILABS_ADDRESS_SPACE_SIZE    = BLHELI_SILABS_BOOTLOADER_ADDRESS
 
-var BLHELI_LAYOUT_SIZE = 0x70
+var BLHELI_LAYOUT_SIZE = 0xF0
 var BLHELI_MIN_SUPPORTED_LAYOUT_REVISION = 0x13
 
 var BLHELI_S_MIN_LAYOUT_REVISION = 0x20
@@ -74,7 +74,9 @@ var BLHELI_LAYOUT = {
 
     LAYOUT:                     {   offset: 0x40, size: 16   },
     MCU:                        {   offset: 0x50, size: 16   },
-    NAME:                       {   offset: 0x60, size: 16   }
+    NAME:                       {   offset: 0x60, size: 16   },
+
+    STARTUP_MELODY:             {   offset: 0x70, size: 128  }
 };
 
 function blheliModeToString(mode) {
@@ -99,7 +101,11 @@ function blheliSettingsObject(settingsUint8Array, layout) {
             } else if (setting.size === 2) {
                 object[prop] = (settingsUint8Array[setting.offset] << 8) | settingsUint8Array[setting.offset + 1];
             } else if (setting.size > 2 ) {
-                object[prop] = String.fromCharCode.apply(undefined, settingsUint8Array.subarray(setting.offset).subarray(0, setting.size)).trim();
+                if (prop === 'STARTUP_MELODY') {
+                    object[prop] = settingsUint8Array.subarray(setting.offset).subarray(0, setting.size);
+                } else {
+                    object[prop] = String.fromCharCode.apply(undefined, settingsUint8Array.subarray(setting.offset).subarray(0, setting.size)).trim();
+                }
             } else {
                 throw new Error('Logic error')
             }
@@ -122,8 +128,14 @@ function blheliSettingsArray(settingsObject, layout, layoutSize) {
                 array[setting.offset] = (settingsObject[prop] >> 8) & 0xff;
                 array[setting.offset + 1] = (settingsObject[prop]) & 0xff;
             } else if (setting.size > 2) {
-                for (let i = 0, len = settingsObject[prop].length; i < setting.size; ++i) {
-                    array[setting.offset + i] = i < len ? settingsObject[prop].charCodeAt(i) : ' '.charCodeAt(0);
+                if (prop  === 'STARTUP_MELODY') {
+                    for (let i = 0, len = settingsObject[prop].length; i < setting.size; ++i) {
+                        array[setting.offset + i] = i < len ? settingsObject[prop][i] % 255 : 0;
+                    }
+                } else {
+                    for (let i = 0, len = settingsObject[prop].length; i < setting.size; ++i) {
+                        array[setting.offset + i] = i < len ? settingsObject[prop].charCodeAt(i) : ' '.charCodeAt(0);
+                    }
                 }
             } else {
                 throw new Error('Logic error')

@@ -378,6 +378,19 @@
         "message": "Flashing <span class=\"message-negative\">failed</span>: <strong>$1</strong>"
     },
 
+    "startupMelody": {
+        "message": "Startup Melody"
+    },
+    "escButtonPlay": {
+        "message": "Play!"
+    },
+    "escButtonStop": {
+        "message": "Stop!"
+    },
+    "escButtonAccept": {
+        "message": "Accept"
+    },
+
     "resetDefaults": {
         "message": "Defaults"
     }

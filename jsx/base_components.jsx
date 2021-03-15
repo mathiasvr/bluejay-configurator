@@ -91,3 +91,102 @@ var Number = React.createClass({
         return val;
     }
 });
+
+var Melody = React.createClass({
+    getInitialState () {
+        return {
+            isPlaying: false,
+            melody: null
+        };
+    },
+    render: function() {
+        //TODO: Disable Accept button when state.melody === null || state.melody === props.value
+        return (
+            <div className="melody">
+                <label>
+                    <span className={this.props.notInSync ? "not-in-sync label" : "label"}>{hacks(this.props.label)}</span>
+                    <span className="btn melody_btn">
+                        <a
+                            href="#"
+                            onClick={this.acceptMelody}
+                        >
+                            {chrome.i18n.getMessage('escButtonAccept')}
+                        </a>
+                    </span>
+                    <span className="btn melody_btn">
+                        <a
+                            href="#"
+                            onClick={this.togglePlayMelody}
+                        >
+                            {this.state.isPlaying ? chrome.i18n.getMessage('escButtonStop') : chrome.i18n.getMessage('escButtonPlay')}
+                        </a>
+                    </span>
+                    <textarea
+                        name={this.props.name}
+                        value={this.getDisplayValue()}
+                        onChange={this.handleChange}
+                    />
+                </label>
+            </div>
+        );
+    },
+    handleChange: function(e) {
+        this.setState({melody: e.target.value})
+    },
+    getDisplayValue: function() {
+        return this.state.melody === null ? Rtttl.fromBluejayStartupMelody(this.props.value) : this.state.melody;
+    },
+    acceptMelody: function() {
+
+        try {
+            // Little Easter egg
+            let melody = this.state.melody === null ? Rtttl.fromBluejayStartupMelody(this.props.value) : this.state.melody
+            melody = melody.trim() === ":D"
+                     ? "D:d=4,o=5,b=110:32c,8d.,16f.,16p.,8f,32d,16e.,8d,8c,8a4,8d.,16g.,16p.,8g"
+                     : melody
+            let startupMelody = Rtttl.toBluejayStartupMelody(melody, this.props.melodyLength)
+            var self = this
+            // Update the displayValue so we are looking at the accepted melody
+            this.setState({melody: Rtttl.fromBluejayStartupMelody(startupMelody)}, function(){
+                self.props.onChange(self.props.name, startupMelody);
+            })
+        } catch (err) {
+            alert(err)
+        }
+    },
+    togglePlayMelody: function() {
+        var self = this
+
+        this.setState({ isPlaying: !self.state.isPlaying }, function(){
+            if (self.state.isPlaying) {
+                try {
+                    let melody = self.state.melody === null ? Rtttl.fromBluejayStartupMelody(self.props.value) : self.state.melody
+                    const parsedRtttl = Rtttl.parse(melody)
+                    const audioCtx = new AudioContext()
+                    _playMelody(parsedRtttl.melody, audioCtx)
+                } catch(err) {
+                    alert(err)
+                }
+            }
+        })
+
+        function _playMelody(melody, audioCtx) {
+            if (melody.length === 0 || !self.state.isPlaying) {
+                self.setState({ isPlaying: false })
+                return
+            }
+            const osc = audioCtx.createOscillator()
+            osc.type = 'square'
+            osc.start(0)
+
+            const note = melody[0]
+            osc.frequency.value = note.frequency
+            osc.connect(audioCtx.destination)
+
+            setTimeout(() => {
+                osc.disconnect(audioCtx.destination)
+                _playMelody(melody.slice(1), audioCtx, osc)
+            }, note.duration)
+        }
+    }
+});

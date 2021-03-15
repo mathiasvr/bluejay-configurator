@@ -124,6 +124,17 @@ var IndividualSettings = React.createClass({
                     />
                 );
             }
+            case 'melody': {
+                return (
+                    <Melody
+                        name={desc.name}
+                        value={settings[desc.name]}
+                        label={desc.label}
+                        melodyLength={desc.melodyLength}
+                        onChange={this.handleChange}
+                    />
+                );
+            }
             default: throw new Error('Logic error');
         }
     },
