@@ -5,7 +5,7 @@
 // todo: remove multi
 var BLUEJAY_SETTINGS_DESCRIPTIONS = {
 
-    '203': { //  With Bluejay startup tunes
+    '203': { //  201 With Bluejay startup tunes
         MULTI: {
             base:
             [
@@ -77,14 +77,6 @@ var BLUEJAY_SETTINGS_DESCRIPTIONS = {
                 },
                 {
                     name: 'BRAKE_ON_STOP', type: 'bool', label: 'escBrakeOnStop'
-                },
-                {
-                    name: 'DAMPING_MODE', type: 'enum', label: '_Damping mode (Complementary PWM)',
-                    options: [
-                        { value: '0', label: 'Off' },
-                        { value: '1', label: 'Not during startup' },
-                        { value: '2', label: 'On' }
-                    ]
                 }
             ]
         }
@@ -180,11 +172,11 @@ var BLUEJAY_SETTINGS_DESCRIPTIONS = {
             base:
             [
                 {
-                    name: 'STARTUP_POWER_MIN', type: 'number', label: '_Minimum Startup Power (Boost)', 
+                    name: 'STARTUP_POWER_MIN', type: 'number', label: '_Minimum Startup Power (Boost)',
                     min: 1000, max: 1125, step: 5, displayFactor: 1000 / 2047, displayOffset: 1000, displayPrecision: 0
                 },
                 {
-                    name: 'STARTUP_POWER_MAX', type: 'number', label: '_Maximum Startup Power (Protection)', 
+                    name: 'STARTUP_POWER_MAX', type: 'number', label: '_Maximum Startup Power (Protection)',
                     // Note: The real displayFactor is 1000 / 255 but 250 makes the slider nicer to work with minimal loss of accuracy
                     min: 1004, max: 1300, step: 4, displayFactor: 1000 / 250, displayOffset: 1000, displayPrecision: 0
                 },
