@@ -412,14 +412,22 @@ var BLUEJAY_INDIVIDUAL_SETTINGS = [
             { value: '3', label: 'Bidirectional' }, { value: '4', label: 'Bidirectional Reversed' }
         ]
     },
-
     {
-    name: 'STARTUP_MELODY', type: 'melody', label: 'startupMelody',
-    value: [53,66,5,0,77,45,5,0,53,66,5,0,92,38,200,0,77,45,140,25,140,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    melodyLength: 128
+        name: 'STARTUP_MELODY', type: 'melody', label: 'startupMelody',
+        value: [53,66,5,0,77,45,5,0,53,66,5,0,92,38,200,0,77,45,140,25,140,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        melodyLength: 128
     }
 ];
 
+var BLUEJAY_INDIVIDUAL_SETTINGS_200 = [
+    {
+        name: 'MOTOR_DIRECTION', type: 'enum', label: 'escMotorDirection',
+        options: [
+            { value: '1', label: 'Normal' }, { value: '2', label: 'Reversed' },
+            { value: '3', label: 'Bidirectional' }, { value: '4', label: 'Bidirectional Reversed' }
+        ]
+    },
+];
 
 var BLHELI_S_INDIVIDUAL_SETTINGS_BACKWARD = [
     {
@@ -446,9 +454,9 @@ var BLHELI_S_INDIVIDUAL_SETTINGS_BACKWARD = [
 
 var BLUEJAY_INDIVIDUAL_SETTINGS_DESCRIPTIONS = {
     '203': { base: BLUEJAY_INDIVIDUAL_SETTINGS },
-    '202': { base: BLUEJAY_INDIVIDUAL_SETTINGS },
-    '201': { base: BLUEJAY_INDIVIDUAL_SETTINGS },
-    '200': { base: BLUEJAY_INDIVIDUAL_SETTINGS },
+    '202': { base: BLUEJAY_INDIVIDUAL_SETTINGS_200 },
+    '201': { base: BLUEJAY_INDIVIDUAL_SETTINGS_200 },
+    '200': { base: BLUEJAY_INDIVIDUAL_SETTINGS_200 },
     '33': { base: BLHELI_S_INDIVIDUAL_SETTINGS_BACKWARD }
 };
 
