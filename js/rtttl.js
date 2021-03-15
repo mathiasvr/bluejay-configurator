@@ -420,7 +420,7 @@ static _calculateDuration(beatEvery, noteDuration, isDotted) {
  * @private
  */
 static _calculateBluejayTemp3FromFrequency(freq) {
-  return freq === 0 ? 0 : Math.round(328687/freq**1.3746);
+  return freq === 0 ? 0 : Math.round(1000000 / (freq * 24.72) - 399.3 / 24.72);
 }
 
 /**
@@ -431,7 +431,7 @@ static _calculateBluejayTemp3FromFrequency(freq) {
  * @private
  */
 static _calculateFrequencyFromBluejayTemp3(temp3) {
-  return temp3 === 0 ? 0 : (328687/temp3)**(1/1.3746);
+  return temp3 === 0 ? 0 : 1000000 / (24.72 * temp3 + 399.3);
 }
 
 /**
