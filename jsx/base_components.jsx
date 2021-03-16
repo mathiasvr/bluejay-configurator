@@ -106,7 +106,7 @@ var Melody = React.createClass({
                 <label>
                     <span className={this.props.notInSync ? "not-in-sync label" : "label"}>{hacks(this.props.label)}</span>
                     <span className="btn melody_btn">
-                        <a
+                        <a className={this.state.melody === null || this.state.melody === Rtttl.fromBluejayStartupMelody(this.props.value) ? "disabled" : ""}
                             href="#"
                             onClick={this.acceptMelody}
                         >
