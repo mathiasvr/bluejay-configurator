@@ -1,4 +1,4 @@
-var BLUEJAY_ESCS_REMOTE = 'https://raw.githubusercontent.com/mathiasvr/blheli-configurator/bluejay/js/bluejay_escs.json';
+var BLUEJAY_ESCS_REMOTE = 'https://raw.githubusercontent.com/mathiasvr/bluejay-configurator/bluejay/js/bluejay_escs.json';
 var BLUEJAY_ESCS_LOCAL = './js/bluejay_escs.json';
 var BLUEJAY_ESCS_KEY = 'escs';
 
