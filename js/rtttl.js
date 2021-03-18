@@ -80,9 +80,9 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
         let pulses_needed = Math.round(item.duration / duration_per_pulse_ms);
 
         while (pulses_needed > 0 && currentResultIndex < result.length) {
-          result[currentResultIndex++] = pulses_needed%MAX_ITEM_VALUE;
+          result[currentResultIndex++] = Math.min(pulses_needed, MAX_ITEM_VALUE - 1);
           result[currentResultIndex++] = temp3;
-          pulses_needed = Math.floor(pulses_needed/MAX_ITEM_VALUE);
+          pulses_needed -= result[currentResultIndex - 2];
         }
       } else {
           console.warn("Skipping note of frequency: ", item.frequency)
@@ -93,9 +93,9 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
         let duration = Math.round(item.duration);
 
         while (duration > 0 && currentResultIndex < result.length) {
-            result[currentResultIndex++] = duration%MAX_ITEM_VALUE;
+            result[currentResultIndex++] = Math.min(duration, MAX_ITEM_VALUE - 1);
             result[currentResultIndex++] = 0;
-            duration = Math.floor(duration/MAX_ITEM_VALUE);
+            duration -= result[currentResultIndex - 2];
         }
     }
 
@@ -148,7 +148,7 @@ static fromBluejayStartupMelody(startupMelody, melodyName) {
 
   // For now assume the smallest quantity (1/64) ~ smallestDuration/2
   let smallestDuration = melodyNotes.reduce((m, item) => Math.min(m, item.duration), melodyNotes[0].duration)/2;
-  let quantizedDuration = (duration) => Math.floor(duration/smallestDuration)*smallestDuration;
+  let quantizedDuration = (duration) => Math.round(duration/smallestDuration)*smallestDuration;
 
   //TODO: Find the correct 1/32nd note duration
   let thirtySecondNoteDuration = 2*smallestDuration;
