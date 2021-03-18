@@ -17,13 +17,14 @@ var BLHELI_MODES = {
 };
 
 var BLHELI_SILABS_EEPROM_OFFSET         = 0x1A00
+var MELODY_EEPROM_OFFSET                = 0x1B00
 var BLHELI_SILABS_PAGE_SIZE             = 0x0200
 var BLHELI_SILABS_BOOTLOADER_ADDRESS    = 0x1C00
 var BLHELI_SILABS_BOOTLOADER_SIZE       = 0x0200
 var BLHELI_SILABS_FLASH_SIZE            = 0x2000
 var BLHELI_SILABS_ADDRESS_SPACE_SIZE    = BLHELI_SILABS_BOOTLOADER_ADDRESS
 
-var BLHELI_LAYOUT_SIZE = 0xF0
+var BLHELI_LAYOUT_SIZE = 0x70
 var BLHELI_MIN_SUPPORTED_LAYOUT_REVISION = 0x13
 
 var BLHELI_S_MIN_LAYOUT_REVISION = 0x20
@@ -72,12 +73,14 @@ var BLHELI_LAYOUT = {
     BRAKE_ON_STOP:              {   offset: 0x27, size: 1   },
     LED_CONTROL:                {   offset: 0x28, size: 1   },
 
-    LAYOUT:                     {   offset: 0x40, size: 16   },
-    MCU:                        {   offset: 0x50, size: 16   },
-    NAME:                       {   offset: 0x60, size: 16   },
-
-    STARTUP_MELODY:             {   offset: 0x70, size: 128  }
+    LAYOUT:                     {   offset: 0x40, size: 16  },
+    MCU:                        {   offset: 0x50, size: 16  },
+    NAME:                       {   offset: 0x60, size: 16  },
 };
+
+var MELODY_LAYOUT = { 
+    STARTUP_MELODY:             {   offset: 0x00, size: 254 }
+}
 
 function blheliModeToString(mode) {
     for (var property in BLHELI_MODES) {

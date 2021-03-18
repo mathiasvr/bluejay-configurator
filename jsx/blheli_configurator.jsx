@@ -152,10 +152,12 @@ var Configurator = React.createClass({
                 var isSiLabs = [ _4way_modes.SiLC2, _4way_modes.SiLBLB ].includes(interfaceMode),
                     isArm = interfaceMode === _4way_modes.ARMBLB,
                     settingsArray = null,
+                    melodyArray = null,
                     layout = BLHELI_LAYOUT;
 
                 if (isSiLabs) {
                     settingsArray = (await _4way.read(BLHELI_SILABS_EEPROM_OFFSET, BLHELI_LAYOUT_SIZE)).params;
+                    melodyArray = (await _4way.read(MELODY_EEPROM_OFFSET, MELODY_LAYOUT.STARTUP_MELODY.size)).params;
                 } else if (isArm) {
                     settingsArray = (await _4way.read(OPEN_ESC_EEPROM_OFFSET, OPEN_ESC_LAYOUT_SIZE)).params;
                     layout = OPEN_ESC_LAYOUT;
@@ -164,6 +166,9 @@ var Configurator = React.createClass({
                 }
 
                 const settings = blheliSettingsObject(settingsArray, layout);
+                if (melodyArray) {
+                    settings.STARTUP_MELODY = blheliSettingsObject(melodyArray, MELODY_LAYOUT).STARTUP_MELODY
+                }
 
                 escSettings[esc] = settings;
                 escMetainfo[esc].available = true;
@@ -214,11 +219,13 @@ var Configurator = React.createClass({
             var isSiLabs = [ _4way_modes.SiLC2, _4way_modes.SiLBLB ].includes(interfaceMode),
                 isArm = interfaceMode === _4way_modes.ARMBLB,
                 readbackSettings = null,
+                readbackMelody = null,
                 layout = BLHELI_LAYOUT,
                 layoutSize = BLHELI_LAYOUT_SIZE;
 
             if (isSiLabs) {
                 readbackSettings = (await _4way.read(BLHELI_SILABS_EEPROM_OFFSET, BLHELI_LAYOUT_SIZE)).params;
+                readbackMelody = (await _4way.read(MELODY_EEPROM_OFFSET, MELODY_LAYOUT.STARTUP_MELODY.size)).params;
             } else if (isArm) {
                 readbackSettings = (await _4way.read(OPEN_ESC_EEPROM_OFFSET, OPEN_ESC_LAYOUT_SIZE)).params;
                 layout = OPEN_ESC_LAYOUT;
@@ -229,14 +236,22 @@ var Configurator = React.createClass({
 
             // Check for changes and perform write
             var escSettings = blheliSettingsArray(this.state.escSettings[esc], layout, layoutSize);
+            if (isSiLabs) {
+                // todo bluejay only
+                var melodySettings = blheliSettingsArray(this.state.escSettings[esc], MELODY_LAYOUT, MELODY_LAYOUT.STARTUP_MELODY.size);
+            }
 
             // check for unexpected size mismatch
             if (escSettings.byteLength != readbackSettings.byteLength) {
                 throw new Error('byteLength of buffers do not match')
             }
 
+            if (melodySettings.byteLength != readbackMelody.byteLength) {
+                throw new Error('melody byteLength of buffers do not match')
+            }
+
             // check for actual changes, maybe we should not write to this ESC at all
-            if (compare(escSettings, readbackSettings)) {
+            if (compare(escSettings, readbackSettings) && compare(melodySettings, readbackMelody)) {
                 GUI.log(chrome.i18n.getMessage('writeSetupNoChanges', [ esc + 1 ]));
                 return;
             }
@@ -246,7 +261,8 @@ var Configurator = React.createClass({
                 await _4way.pageErase(BLHELI_SILABS_EEPROM_OFFSET / BLHELI_SILABS_PAGE_SIZE);
                 // actual write
                 await _4way.write(BLHELI_SILABS_EEPROM_OFFSET, escSettings);
-                GUI.log(chrome.i18n.getMessage('writeSetupBytesWritten', [ esc + 1, escSettings.byteLength ]));
+                await _4way.write(MELODY_EEPROM_OFFSET, melodySettings);
+                GUI.log(chrome.i18n.getMessage('writeSetupBytesWritten', [ esc + 1, escSettings.byteLength + melodySettings.byteLength ]));
             } else if (isArm) {
                 // actual write
                 await _4way.write(OPEN_ESC_EEPROM_OFFSET, escSettings);
@@ -274,13 +290,14 @@ var Configurator = React.createClass({
 
             if (isSiLabs) {
                 readbackSettings = (await _4way.read(BLHELI_SILABS_EEPROM_OFFSET, BLHELI_LAYOUT_SIZE)).params;
+                readbackMelody = (await _4way.read(MELODY_EEPROM_OFFSET, MELODY_LAYOUT.STARTUP_MELODY.size)).params;
             } else if (isArm) {
                 readbackSettings = (await _4way.read(OPEN_ESC_EEPROM_OFFSET, OPEN_ESC_LAYOUT_SIZE)).params;
             } else {
                 readbackSettings = (await _4way.readEEprom(0, BLHELI_LAYOUT_SIZE)).params;
             }
 
-            if (!compare(escSettings, readbackSettings)) {
+            if (!compare(escSettings, readbackSettings) || !compare(melodySettings, readbackMelody)) {
                 throw new Error('Failed to verify settings')
             }
 
@@ -375,7 +392,7 @@ var Configurator = React.createClass({
         // select flashing algorithm given interface mode
         await selectInterfaceAndFlash(initFlashResponse);
 
-        var settingsArray;
+        var settingsArray, melodyArray;
         var layout = BLHELI_LAYOUT;
         if (isAtmel) {
             settingsArray = (await _4way.readEEprom(0, BLHELI_LAYOUT_SIZE)).params;
@@ -391,10 +408,14 @@ var Configurator = React.createClass({
             layout = OPEN_ESC_LAYOUT;
         } else {
             settingsArray = (await _4way.read(BLHELI_SILABS_EEPROM_OFFSET, BLHELI_LAYOUT_SIZE)).params;
+            melodyArray = (await _4way.read(MELODY_EEPROM_OFFSET, MELODY_LAYOUT.STARTUP_MELODY.size)).params;
         }
 
         // migrate settings from previous version if asked to
         const newSettings = blheliSettingsObject(settingsArray, layout);
+        if (melodyArray) {
+            newSettings.STARTUP_MELODY = blheliSettingsObject(melodyArray, MELODY_LAYOUT).STARTUP_MELODY
+        }
 
         if (isArm) {
             GUI.log('No need to migrate settings for Open ESC (yet).');
