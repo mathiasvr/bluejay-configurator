@@ -130,7 +130,7 @@ function blheliSettingsArray(settingsObject, layout, layoutSize) {
             } else if (setting.size > 2) {
                 if (prop  === 'STARTUP_MELODY') {
                     for (let i = 0, len = settingsObject[prop].length; i < setting.size; ++i) {
-                        array[setting.offset + i] = i < len ? settingsObject[prop][i] % 255 : 0;
+                        array[setting.offset + i] = i < len ? settingsObject[prop][i] % 256 : 0;
                     }
                 } else {
                     for (let i = 0, len = settingsObject[prop].length; i < setting.size; ++i) {

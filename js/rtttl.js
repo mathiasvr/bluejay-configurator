@@ -143,6 +143,8 @@ static fromBluejayStartupMelody(startupMelody, melodyName) {
         } else {
             melodyNotes[melodyNotes.length - 1].duration += dur;
         }
+    } else {
+        break;
     }
   }
 
