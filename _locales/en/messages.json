@@ -384,6 +384,9 @@
     "escButtonPlay": {
         "message": "Play!"
     },
+    "escButtonPlayAll": {
+        "message": "Play all"
+    },
     "escButtonStop": {
         "message": "Stop!"
     },

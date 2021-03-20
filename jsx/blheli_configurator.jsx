@@ -8,6 +8,10 @@ if (window.regeneratorRuntime == undefined) {
     window.regeneratorRuntime = global.regeneratorRuntime;
 }
 
+let melodyTarget = 4;
+let melodyCurrent = 0;
+let stopPlaying = false;
+
 var Configurator = React.createClass({
     getInitialState: () => {
         return {
@@ -23,7 +27,11 @@ var Configurator = React.createClass({
             ignoreMCULayout: false,
 
             flashingEscIndex: undefined,
-            flashingEscProgress: 0
+            flashingEscProgress: 0,
+
+            isPlaying: {},
+            isPlayingAll: false,
+            isPlayingAny: false
         };
     },
     componentWillMount: function() {
@@ -904,8 +912,8 @@ var Configurator = React.createClass({
                 case _4way_modes.SiLC2:
                     return BLHELI_SILABS_FLASH_SIZE;
                 case _4way_modes.SiLBLB: {
-                    MCU = findMCU(signature, this.state.supportedBluejayESCs.signatures[BLUEJAY_TYPES.EFM8]) || 
-                          findMCU(signature, this.state.supportedBlheliESCs.signatures[BLHELI_TYPES.BLHELI_S_SILABS]) || 
+                    MCU = findMCU(signature, this.state.supportedBluejayESCs.signatures[BLUEJAY_TYPES.EFM8]) ||
+                          findMCU(signature, this.state.supportedBlheliESCs.signatures[BLHELI_TYPES.BLHELI_S_SILABS]) ||
                           findMCU(signature, this.state.supportedBlheliESCs.signatures.SiLabs);
 
                     break;
@@ -1031,7 +1039,7 @@ var Configurator = React.createClass({
         });
     },
     render: function() {
-        if (!this.state.supportedBlheliESCs || !this.state.supportedBluejayESCs || !this.state.supportedOpenEscESCs || 
+        if (!this.state.supportedBlheliESCs || !this.state.supportedBluejayESCs || !this.state.supportedOpenEscESCs ||
             !this.state.blheliFirmwareVersions || !this.state.bluejayFirmwareVersions || !this.state.openEscFirmwareVersions) return null;
 
         return (
@@ -1187,9 +1195,104 @@ var Configurator = React.createClass({
                     isFlashing={this.state.flashingEscIndex === idx}
                     progress={this.state.flashingEscProgress}
                     onFlash={this.flashOne}
+                    onPlayMelody={this.handleOnPlayMelody}
+                    onPlayMelodyAll={this.handleOnPlayMelodyAll}
+                    isPlaying={this.state.isPlaying}
+                    isPlayingAll={this.state.isPlayingAll}
+                    isPlayingAny={this.state.isPlayingAny}
                 />
             );
         });
+    },
+    handleOnPlayMelody: function(index) {
+        if(this.state.isPlayingAny) {
+          stopPlaying = true;
+          return;
+        }
+
+        melodyCurrent = 0;
+        melodyTarget = 1;
+        const newState = Object.assign({}, this.state.isPlaying);
+        newState[index] = true;
+
+        this.setState({
+          isPlaying: newState,
+          isPlayingAny: true,
+        }, function() {
+            this.startMelody(index);
+        });
+    },
+    handleOnPlayMelodyAll: function() {
+        if(this.state.isPlayingAll) {
+          stopPlaying = true;
+          return;
+        }
+
+        melodyCurrent = 0;
+        melodyTarget = 0;
+
+        const newState = Object.assign({}, this.state.isPlaying);
+        for(let i = 0; i < this.state.escSettings.length; i += 1) {
+            newState[i] = true;
+            melodyTarget += 1;
+        }
+
+        this.setState({
+          isPlaying: newState,
+          isPlayingAll: true,
+        }, function() {
+            for(let i = 0; i < this.state.escSettings.length; i += 1) {
+                this.startMelody(i);
+            }
+        });
+    },
+    startMelody(index) {
+        const settings = this.state.escSettings[index];
+        const melody = Rtttl.fromBluejayStartupMelody(settings.STARTUP_MELODY);
+
+        try {
+            const parsedRtttl = Rtttl.parse(melody);
+            const audioCtx = new AudioContext();
+            this.playMelody(index, parsedRtttl.melody, audioCtx);
+        } catch(err) {
+            alert(err);
+        }
+    },
+    playMelody: function(index, melody, audioCtx) {
+        if (melody.length === 0 || stopPlaying) {
+            melodyCurrent += 1;
+            this.melodyDone();
+            return;
+        }
+
+        const osc = audioCtx.createOscillator();
+        osc.type = 'square';
+        osc.start(0);
+
+        const note = melody[0];
+        osc.frequency.value = note.frequency;
+        osc.connect(audioCtx.destination);
+
+        setTimeout(() => {
+            osc.disconnect(audioCtx.destination);
+            this.playMelody(index, melody.slice(1), audioCtx, osc);
+        }, note.duration);
+    },
+    melodyDone() {
+        if(melodyCurrent >= melodyTarget) {
+            const newState = {};
+            for(let i = 0; i <= this.state.escSettings.length; i += 1) {
+                newState[i] = false;
+            }
+
+            stopPlaying = false;
+
+            this.setState({
+                isPlaying: newState,
+                isPlayingAll: false,
+                isPlayingAny: false,
+            });
+        }
     },
     onFirmwareLoaded: function(hex, eep) {
         this.setState({
