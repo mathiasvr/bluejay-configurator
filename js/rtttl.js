@@ -51,7 +51,15 @@ static parse(rtttl) {
  *
  * @param {string} rtttl - RTTTL String
  * @param {int} startupMelodyLength - RTTTL String
- * @returns an array of (Number of pulses, Pulse width) tuples
+ * @returns an object {
+ *     "startupMelodyData": [] , // An array of (Number of pulses, Pulse width) tuples for each note of rtttl
+ *     "errorCodes": [] // An array of errors encountered while processing each note of rtttl
+ * }
+ *
+ * error codes:
+ * 0 = no error
+ * 1 = invalid note frequency
+ * 2 = note too long
  */
 static toBluejayStartupMelody(rtttl, startupMelodyLength) {
 
@@ -62,6 +70,7 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
   const MAX_ITEM_VALUE = 2**8;
   let melody = parsedData.melody;  
   let result = new Uint8Array(startupMelodyLength);
+  let errorCodes = new Array(melody.length);
 
   var currentResultIndex = 0;
   var currentMelodyIndex = 0;
@@ -70,7 +79,6 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
     var item = melody[currentMelodyIndex];
     
     // Check if the current note is a pause
-
     if (item.frequency != 0) {
       // temp3 is a measure of wavelength of the sound
       let temp3 = Rtttl._calculateBluejayTemp3FromFrequency(item.frequency);
@@ -84,8 +92,17 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
           result[currentResultIndex++] = temp3;
           pulses_needed -= result[currentResultIndex - 2];
         }
+
+        // If the current note doesn't fit in the result,
+        // then the while loop exits with pulses_needed > 0
+        if (pulses_needed > 0) {
+          errorCodes[currentMelodyIndex] = 2;
+        } else {
+          errorCodes[currentMelodyIndex] = 0;
+        }
       } else {
           console.warn("Skipping note of frequency: ", item.frequency)
+          errorCodes[currentMelodyIndex] = 1;
       }
     } else {
         // Each (Temp3, Temp4) tuple can wait from 1-255ms
@@ -97,16 +114,28 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
             result[currentResultIndex++] = 0;
             duration -= result[currentResultIndex - 2];
         }
+
+        // If the current note doesn't fit in the result,
+        // then the while loop exits with duration > 0
+        if (duration > 0) {
+          errorCodes[currentMelodyIndex] = 2;
+        } else {
+          errorCodes[currentMelodyIndex] = 0;
+        }
     }
 
     currentMelodyIndex++;
   }
   
-  if (currentMelodyIndex < melody.length) {
-    throw new Error("Only " + currentMelodyIndex + " notes out of " + melody.length + " fit in the startup sequence");
+  while (currentMelodyIndex < melody.length) {
+    errorCodes[currentMelodyIndex] = 2;
+    currentMelodyIndex++;
   }
 
-  return result
+  return {
+    "startupMelodyData": result,
+    "errorCodes": errorCodes
+  }
 
 }
 

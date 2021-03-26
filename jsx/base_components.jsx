@@ -144,7 +144,7 @@ var Melody = React.createClass({
             melody = melody.trim() === ":D"
                      ? "D:d=4,o=5,b=110:32c,8d.,16f.,16p.,8f,32d,16e.,8d,8c,8a4,8d.,16g.,16p.,8g"
                      : melody
-            let startupMelody = Rtttl.toBluejayStartupMelody(melody, this.props.melodyLength)
+            let startupMelody = Rtttl.toBluejayStartupMelody(melody, this.props.melodyLength).startupMelodyData
             var self = this
             // Update the displayValue so we are looking at the accepted melody
             this.setState({melody: Rtttl.fromBluejayStartupMelody(startupMelody)}, function(){
