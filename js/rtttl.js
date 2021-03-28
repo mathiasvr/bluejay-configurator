@@ -1,15 +1,15 @@
 // Copyright 2021 Dinesh Manajipet
-// 
+//
 // This is based on the MIT Licensed work done by Adam Rahwane in https://github.com/adamonsoon/rtttl-parse
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 // and associated documentation files (the "Software"), to deal in the Software without restriction,
 // including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
 // and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
 // subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 // INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 // IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
@@ -50,11 +50,16 @@ static parse(rtttl) {
  * Parse RTTTL to Bluejay/BlHeli ESC startup melody data
  *
  * @param {string} rtttl - RTTTL String
- * @param {int} startupMelodyLength - RTTTL String
+ * @param {int} startupMelodyLength - Bluejay Temp4,Temp3 array length. If unspecified, it is assumed to be 128 bytes
  * @returns an object {
  *     "startupMelodyData": [] , // An array of (Number of pulses, Pulse width) tuples for each note of rtttl
  *     "errorCodes": [] // An array of errors encountered while processing each note of rtttl
  * }
+ *
+ * Startup melody data structure is:
+ * [2 bytes of bpm],[1 byte of default octave],[1 byte of default duration][(Temp4, Temp3) values]
+ * Temp4 = number of pulses (~ duration)
+ * Temp3 = duration of each pulse (~ pitch)
  *
  * error codes:
  * 0 = no error
@@ -65,19 +70,29 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
 
   let parsedData = Rtttl.parse(rtttl);
   startupMelodyLength = startupMelodyLength || 128;
-  
+
+  if (startupMelodyLength < 4) {
+    throw new Error("startupMelodyLength is too small to fit a Bluejay Startup Melody");
+  }
+
   // Melody is basically an array of [{ duration(in ms): number, frequency (in Hz): number }]
   const MAX_ITEM_VALUE = 2**8;
-  let melody = parsedData.melody;  
+  let melody = parsedData.melody;
   let result = new Uint8Array(startupMelodyLength);
   let errorCodes = new Array(melody.length);
 
-  var currentResultIndex = 0;
+  let bpm = Math.floor(parsedData.defaults.bpm) % (2**16);
+  result[0] = (bpm >> 8) & (2**8 - 1);
+  result[1] = (bpm) & (2**8 - 1);
+  result[2] = Math.floor(parsedData.defaults.octave) % (2**8);
+  result[3] = Math.floor(parsedData.defaults.duration) % (2**8);
+
+  var currentResultIndex = 4;
   var currentMelodyIndex = 0;
 
   while(currentMelodyIndex < melody.length && currentResultIndex < result.length) {
     var item = melody[currentMelodyIndex];
-    
+
     // Check if the current note is a pause
     if (item.frequency != 0) {
       // temp3 is a measure of wavelength of the sound
@@ -126,14 +141,14 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
 
     currentMelodyIndex++;
   }
-  
+
   while (currentMelodyIndex < melody.length) {
     errorCodes[currentMelodyIndex] = 2;
     currentMelodyIndex++;
   }
 
   return {
-    "startupMelodyData": result,
+    "data": result,
     "errorCodes": errorCodes
   }
 
@@ -142,55 +157,57 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
 /**
  * Parse a Bluejay startup melody array into an rtttl string
  *
- * @param {Uint8Array} startupMelody - an array of [(Temp4, Temp3)] values
+ * @param {Uint8Array} startupMelodyData - an array of [(Temp4, Temp3)] values
  * @param {string}} melodyName - Name to use in generated rtttl
  * @returns an array of (Number of pulses, Pulse width) tuples
  */
-static fromBluejayStartupMelody(startupMelody, melodyName) {
+static fromBluejayStartupMelody(startupMelodyData, melodyName) {
 
   melodyName = melodyName || "Melody"
 
-  if (startupMelody.length === 0) {
-    return melodyName + ":d=1,o=4,bpm=100:";
+  if (startupMelodyData.length < 4) {
+    return melodyName + "Melody:d=1,o=4,bpm=100:";
   }
+
+  let defaults = {
+      bpm: (startupMelodyData[0] << 8) + startupMelodyData[1],
+      octave: startupMelodyData[2],
+      duration: startupMelodyData[3]
+  };
+  let fourthNoteDuration = 60000/defaults.bpm;
+  let sixtyFourthNoteDuration = fourthNoteDuration/16;
+  let fullNoteDuration = 4*fourthNoteDuration;
 
   let melodyNotes = [];
 
-  // First glob all the same adjacent notes, because ones we could have split them up due to temp3, temp4 size limits
-  for (var i = 0; i + 1 < startupMelody.length; i += 2){
-    let freq = Rtttl._calculateFrequencyFromBluejayTemp3(startupMelody[i+1]);
-    let dur = freq == 0? startupMelody[i] : (1000/freq)*startupMelody[i];
+  // First try to glob all the same adjacent notes, that could have been split up due to Temp4 size limits
+  for (var i = 4; i + 1 < startupMelodyData.length; i += 2){
+    let freq = Rtttl._calculateFrequencyFromBluejayTemp3(startupMelodyData[i+1]);
+    let dur = freq == 0? startupMelodyData[i] : (1000/freq)*startupMelodyData[i];
 
     if (dur > 0) {
-        if (melodyNotes.length === 0 || Math.abs(melodyNotes[melodyNotes.length - 1].frequency - freq) > 0.01){
+        // Two adjacent notes of same frequency can be assumed to be split up IF
+        // Temp4 value of the previous note is 255
+        // TODO: Improve this heuristic by making sure Temp4 = 255 is not a quantized note duration
+        if (melodyNotes.length > 0
+            && (Math.abs(melodyNotes[melodyNotes.length - 1].frequency - freq) < 0.01
+                && startupMelodyData[i-2] === 255)){
+            melodyNotes[melodyNotes.length - 1].duration += dur;
+        } else {
             melodyNotes.push({
                               duration: dur,
                               frequency: freq,
                               musicalDuration: 1,
                               musicalNote: Rtttl._calculateNoteNameFromFrequency(freq),
                               musicalOctave: Rtttl._calculateNoteOctaveFromFrequency(freq)});
-        } else {
-            melodyNotes[melodyNotes.length - 1].duration += dur;
         }
     } else {
         break;
     }
   }
 
-  // For now assume the smallest quantity (1/64) ~ smallestDuration/2
-  let smallestDuration = melodyNotes.reduce((m, item) => Math.min(m, item.duration), melodyNotes[0].duration)/2;
-  let quantizedDuration = (duration) => Math.round(duration/smallestDuration)*smallestDuration;
-
-  //TODO: Find the correct 1/32nd note duration
-  let thirtySecondNoteDuration = 2*smallestDuration;
-
-  let fullNoteDuration = 32*thirtySecondNoteDuration;
-
-  //TODO: Verify why bpm sometimes jumps around
-  let bpm = 4*Math.floor(60000/fullNoteDuration);
+  let quantizedDuration = (duration) => Math.round(duration/sixtyFourthNoteDuration)*sixtyFourthNoteDuration;
   let rttlDuration = (musicalDuration) => Math.pow(2, -Math.floor(Math.log2(musicalDuration)));
-  let defaultOctave = Rtttl._mostCommonValue(melodyNotes.map((item) => item.musicalOctave))
-  let defaultDuration = rttlDuration(Rtttl._mostCommonValue(melodyNotes.map((item) => item.duration/fullNoteDuration)))
 
   let melodyString = ''
   for (var item of melodyNotes) {
@@ -199,16 +216,16 @@ static fromBluejayStartupMelody(startupMelody, melodyName) {
     while (item.musicalDuration > 0) {
       let musicalDuration = item.musicalDuration > 1.5 ? 1.5 : item.musicalDuration; // Maximum allowed note is one and a half note
       let isDottedNote = Math.log2(musicalDuration) - Math.floor(Math.log2(musicalDuration)) !== 0
-      melodyString += (rttlDuration(musicalDuration) === defaultDuration && !isDottedNote? '' : rttlDuration(musicalDuration)) +
+      melodyString += (rttlDuration(musicalDuration) === defaults.duration && !isDottedNote? '' : rttlDuration(musicalDuration)) +
                       (item.musicalNote) +
-                      (item.musicalOctave === defaultOctave || item.musicalOctave === 0 ? '' : item.musicalOctave) +
+                      (item.musicalOctave === defaults.octave || item.musicalOctave === 0 ? '' : item.musicalOctave) +
                       (isDottedNote ? '.' : '') + // Add a dot at the end of half notes
                       ',';
       item.musicalDuration -= musicalDuration;
     }
   }
 
-  return melodyName + ':d='+defaultDuration+',o='+defaultOctave+',b=' + bpm +':' + melodyString.replace(/,$/, '')
+  return melodyName + ':b='+defaults.bpm+',o='+defaults.octave+',d=' + defaults.duration +':' + melodyString.replace(/,$/, '')
 }
 
 
@@ -399,9 +416,8 @@ static _calculateNoteNameFromFrequency(freq) {
     const NOTE_ORDER          = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
     const MIDDLE_OCTAVE       = 4;
     const SEMITONES_IN_OCTAVE = 12;
+    const noteSemitones = Math.round(12 * Math.log2(freq/C4))
 
-    let noteSemitones = Math.round(12 * Math.log2(freq/C4))
-    
     return NOTE_ORDER[noteSemitones % 12]
 }
 
@@ -420,13 +436,12 @@ static _calculateNoteOctaveFromFrequency(freq) {
     const C4           = 261.63;
     const MIDDLE_OCTAVE       = 4;
     const SEMITONES_IN_OCTAVE = 12;
-    
+
     let noteSemitones = Math.round(12 * Math.log2(freq/C4))
     let noteOctave = MIDDLE_OCTAVE + Math.floor(noteSemitones/SEMITONES_IN_OCTAVE)
 
     return noteOctave
 }
-
 
 /**
  * Calculate the duration a note should be played
@@ -465,39 +480,6 @@ static _calculateFrequencyFromBluejayTemp3(temp3) {
   return temp3 === 0 ? 0 : 1000000 / (24.72 * temp3 + 399.3);
 }
 
-/**
- * Given an array, return the most common value
- *
- * @param {array} an array of items which can be compared using ===
- * @returns {var}
- * @private
- */
-static _mostCommonValue(array) {
-  if (array.length < 1) {
-    return null;
-  }
-
-  array.sort();
-  let currentValue = array[0];
-  let currentValueCount = 1;
-  let result = currentValue;
-  let resultCount = 1;
-
-  for (var i = 1; i < array.length; i++) {
-    if (array[i] === currentValue) {
-        currentValueCount += 1;
-    } else {
-        currentValue = array[i];
-        currentValueCount = 1;
-    }
-    
-    if (currentValueCount > resultCount) {
-      result = currentValue;
-      resultCount = currentValueCount;
-    }
-  }
-  
-  return result;
 }
 
-}
+typeof module !== 'undefined'? module.exports = Rtttl : null;
