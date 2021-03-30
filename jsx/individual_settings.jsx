@@ -20,6 +20,8 @@ var IndividualSettings = React.createClass({
             escMetainfo = this.props.escMetainfo[this.props.escIndex],
             layout = (escSettings.LAYOUT || '').trim(),
             name = escSettings.NAME.trim(),
+            pwmfreq = escSettings.PWM_FREQUENCY,
+            pwmfreq = pwmfreq == null || pwmfreq === 0 || pwmfreq === 0xff ? null : pwmfreq,
             make = layout,
 			bootloaderRevision = null;
 
@@ -41,7 +43,10 @@ var IndividualSettings = React.createClass({
         }
 
         return `ESC ${(this.props.escIndex + 1)}: ` + (make ? `${make}, ` : '') +
-            `${escSettings.MAIN_REVISION}.${escSettings.SUB_REVISION}` + (name.length > 0 ? `, ${name}` : '') + (bootloaderRevision !== null ? ` (bootloader version ${bootloaderRevision})` : '');
+            `${escSettings.MAIN_REVISION}.${escSettings.SUB_REVISION}` +
+            (pwmfreq ? `, ${pwmfreq} kHz` : '') + 
+            (name.length > 0 ? `, ${name}` : '') +
+            (bootloaderRevision !== null ? ` (bootloader version ${bootloaderRevision})` : '');
     },
     renderControls: function() {
         const escSettings = this.props.escSettings[this.props.escIndex];

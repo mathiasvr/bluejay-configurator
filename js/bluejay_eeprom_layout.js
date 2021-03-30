@@ -40,7 +40,7 @@ var BLHELI_LAYOUT = {
     STARTUP_POWER_MAX:          {   offset: 0x07, size: 1   },
     __MOTOR_IDLE:               {   offset: 0x08, size: 1   },
     RPM_POWER_SLOPE:            {   offset: 0x09, size: 1   },
-    __PWM_FREQUENCY:            {   offset: 0x0A, size: 1   },
+    PWM_FREQUENCY:              {   offset: 0x0A, size: 1   },
     MOTOR_DIRECTION:            {   offset: 0x0B, size: 1   },
     __INPUT_PWM_POLARITY:       {   offset: 0x0C, size: 1   },
     MODE:                       {   offset: 0x0D, size: 2   },
