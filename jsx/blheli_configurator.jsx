@@ -1248,6 +1248,13 @@ var Configurator = React.createClass({
     },
     startMelody(index) {
         const settings = this.state.escSettings[index];
+        
+        if (!settings.STARTUP_MELODY) {
+            melodyCurrent += 1;
+            this.melodyDone();
+            return;
+        }
+  
         const melody = Rtttl.fromBluejayStartupMelody(settings.STARTUP_MELODY);
 
         try {
