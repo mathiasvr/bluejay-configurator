@@ -1252,31 +1252,42 @@ var Configurator = React.createClass({
 
         try {
             const parsedRtttl = Rtttl.parse(melody);
-            const audioCtx = new AudioContext();
-            this.playMelody(index, parsedRtttl.melody, audioCtx);
+            this.playMelody(parsedRtttl.melody);
         } catch(err) {
             alert(err);
         }
     },
-    playMelody: function(index, melody, audioCtx) {
-        if (melody.length === 0 || stopPlaying) {
-            melodyCurrent += 1;
-            this.melodyDone();
-            return;
-        }
+    playMelody: function(melody) {
+        const audioCtx = new AudioContext();
 
         const osc = audioCtx.createOscillator();
         osc.type = 'square';
+
+        var volume = audioCtx.createGain();
+        osc.connect(volume);
+        volume.connect(audioCtx.destination);
+        volume.gain.value = 0.05;
+
+        // todo: decouple
+        const checkStop = setInterval(() => {
+            if (stopPlaying) osc.stop()
+        }, 100);
+
+        osc.onended = () => {
+            clearInterval(checkStop);
+            volume.disconnect(audioCtx.destination);
+            melodyCurrent += 1;
+            this.melodyDone();
+        }
+
+        let t = audioCtx.currentTime;
+        for (const note of melody) {
+            osc.frequency.setValueAtTime(note.frequency, t);
+            t += note.duration / 1000;
+        }
+
         osc.start(0);
-
-        const note = melody[0];
-        osc.frequency.value = note.frequency;
-        osc.connect(audioCtx.destination);
-
-        setTimeout(() => {
-            osc.disconnect(audioCtx.destination);
-            this.playMelody(index, melody.slice(1), audioCtx, osc);
-        }, note.duration);
+        osc.stop(t);
     },
     melodyDone() {
         if(melodyCurrent >= melodyTarget) {
