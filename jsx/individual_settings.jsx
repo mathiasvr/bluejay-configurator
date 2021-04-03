@@ -132,6 +132,8 @@ var IndividualSettings = React.createClass({
                         label={desc.label}
                         melodyLength={desc.melodyLength}
                         onChange={this.handleChange}
+                        doPlayMusic={this.props.doPlayMusic}
+                        onPlaybackStateChanged={this.handlePlaybackStateChange}
                     />
                 );
             }
@@ -167,6 +169,9 @@ var IndividualSettings = React.createClass({
         var escSettings = this.props.escSettings;
         escSettings[this.props.escIndex][name] = value;
         this.props.onUserInput(escSettings);
+    },
+    handlePlaybackStateChange: function(isPlaying) {
+        this.props.onMusicPlaybackStateChanged(this.props.escIndex, isPlaying);
     },
     flashFirmware: function() {
         this.props.onFlash(this.props.escIndex);

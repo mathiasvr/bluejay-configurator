@@ -382,13 +382,19 @@
         "message": "Startup Melody"
     },
     "escButtonPlay": {
-        "message": "Play!"
+        "message": "Play"
     },
     "escButtonStop": {
-        "message": "Stop!"
+        "message": "Stop"
     },
     "escButtonAccept": {
         "message": "Accept"
+    },
+    "stopStartupMusic": {
+        "message": "Stop"
+    },
+    "playStartupMusic": {
+        "message": "Play Startup Music"
     },
 
     "resetDefaults": {

@@ -105,12 +105,17 @@ var Configurator = React.createClass({
         // Enable `Flash All` if all ESCs are identical
         const canFlash = isOpenEsc ? availableSettings.every(settings => settings.LAYOUT_REVISION === availableSettings[0].LAYOUT_REVISION) : availableSettings.every(settings => settings.LAYOUT === availableSettings[0].LAYOUT);
         const canResetDefaults = isOpenEsc || isBluejay || availableSettings.every(settings => settings.LAYOUT_REVISION > BLHELI_S_MIN_LAYOUT_REVISION);
+        const canPlayMusic = availableSettings.every(settings => settings.STARTUP_MELODY && settings.STARTUP_MELODY.length > 0);
 
         this.setState({
             canRead: true,
             canWrite: availableSettings.length > 0,
             canFlash: availableSettings.length > 0 && canFlash,
-            canResetDefaults: canResetDefaults
+            canResetDefaults: canResetDefaults,
+            canPlayMusic: canPlayMusic,
+            isPlayingMusic: false,
+            doPlayMusic: false,
+            musicPlaybackStatus: (new Array(this.state.escSettings.length)).fill(false)
         });
 
         $('a.connect').removeClass('disabled');
@@ -1089,9 +1094,21 @@ var Configurator = React.createClass({
                             {chrome.i18n.getMessage('resetDefaults')}
                         </a>
                     </div>
+                    <div className={this.state.canPlayMusic ? "btn" : "hidden"}>
+                        <a
+                            href="#"
+                            className={!this.state.selectingFirmware && !this.state.IsFlashing && this.state.canWrite ? "" : "disabled"}
+                            onClick={this.togglePlayStartupMusic}
+                        >
+                            {chrome.i18n.getMessage(this.state.isPlayingMusic ? "stopStartupMusic": "playStartupMusic")}
+                        </a>
+                    </div>
                 </div>
             </div>
         );
+    },
+    togglePlayStartupMusic: function() {
+        this.setState({ doPlayMusic: !this.state.doPlayMusic });
     },
     renderContent: function() {
         const noneAvailable = !this.state.escMetainfo.some(info => info.available);
@@ -1187,9 +1204,25 @@ var Configurator = React.createClass({
                     isFlashing={this.state.flashingEscIndex === idx}
                     progress={this.state.flashingEscProgress}
                     onFlash={this.flashOne}
+                    doPlayMusic={this.state.doPlayMusic}
+                    onMusicPlaybackStateChanged={this.onMusicPlaybackStateChanged}
                 />
             );
         });
+    },
+    onMusicPlaybackStateChanged: function(escIndex, isPlaying) {
+        let musicPlaybackStatus = this.state.musicPlaybackStatus;
+        musicPlaybackStatus[escIndex] = isPlaying;
+        let isPlayingMusic = musicPlaybackStatus.some((a) => a)
+
+        this.setState({
+            musicPlaybackStatus: musicPlaybackStatus,
+            isPlayingMusic: isPlayingMusic,
+        })
+        
+        if (!isPlayingMusic) {
+            this.setState({doPlayMusic: false})
+        }
     },
     onFirmwareLoaded: function(hex, eep) {
         this.setState({

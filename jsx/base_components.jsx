@@ -96,8 +96,18 @@ var Melody = React.createClass({
     getInitialState () {
         return {
             isPlaying: false,
-            melody: null
+            melody: null,
+            osc: null
         };
+    },
+    componentDidUpdate(prevProps) {
+        if (prevProps.doPlayMusic != this.props.doPlayMusic) {
+            if (this.props.doPlayMusic) {
+                this.playMelody()
+            } else {
+                this.stopMelody()
+            }
+        }
     },
     render: function() {
         //TODO: Disable Accept button when state.melody === null || state.melody === props.value
@@ -155,47 +165,58 @@ var Melody = React.createClass({
         }
     },
     togglePlayMelody: function() {
-        var self = this
+        if (!this.state.isPlaying) {
+            this.playMelody()
+        } else {
+            this.stopMelody()
+        }
+    },
+    playMelody: function() {
+        let self = this
 
-        this.setState({ isPlaying: !self.state.isPlaying }, function(){
-            if (self.state.isPlaying) {
-                try {
-                    const melody = self.state.melody || Rtttl.fromBluejayStartupMelody(self.props.value)
-                    const parsedRtttl = Rtttl.parse(melody).melody
+        try {
+            const melody = self.state.melody || Rtttl.fromBluejayStartupMelody(self.props.value)
+            const parsedRtttl = Rtttl.parse(melody).melody
 
-                    let audioContext = new AudioContext()
-                    let osc = audioContext.createOscillator()
-                    let volume = audioContext.createGain()
-                    self.osc = osc
+            let audioContext = new AudioContext()
+            let osc = audioContext.createOscillator()
+            let volume = audioContext.createGain()
+            self.osc = osc
 
-                    osc.type = 'square'
-                    osc.connect(volume)
-                    volume.gain.value = 0.05
+            osc.type = 'square'
+            osc.connect(volume)
+            volume.gain.value = 0.05
 
-                    osc.onended = () => {
-                        self.setState({ isPlaying: false })
-                        volume.disconnect(audioContext.destination)
-                    }
-                    volume.connect(audioContext.destination)
-
-                    let t = audioContext.currentTime
-                    for (const note of parsedRtttl) {
-                        osc.frequency.setValueAtTime(note.frequency, t)
-                        t += note.duration / 1000
-                    }
-
-                    self.osc.start(0)
-                    self.osc.stop(t)
-                } catch(err) {
-                    alert(err)
-                }
+            osc.onended = () => {
+                volume.disconnect(audioContext.destination)
+                self.setState({
+                    isPlaying: false,
+                    osc: null
+                })
+                self.props.onPlaybackStateChanged(false)
             }
-            else {
-                if (self.osc) {
-                    self.osc.stop()
-                    self.osc = null
-                }
+            volume.connect(audioContext.destination)
+
+            let t = audioContext.currentTime
+            for (const note of parsedRtttl) {
+                osc.frequency.setValueAtTime(note.frequency, t)
+                t += note.duration / 1000
             }
-        })
+
+            osc.start(0)
+            osc.stop(t)
+            this.setState({
+                isPlaying: true,
+                osc: osc
+            })
+            this.props.onPlaybackStateChanged(true)
+        } catch(err) {
+            alert(err)
+        }
+    },
+    stopMelody: function() {
+        if (this.state.osc) {
+            this.state.osc.stop()
+        }
     }
 });
