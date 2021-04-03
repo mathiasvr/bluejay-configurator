@@ -160,33 +160,51 @@ var Melody = React.createClass({
         this.setState({ isPlaying: !self.state.isPlaying }, function(){
             if (self.state.isPlaying) {
                 try {
-                    let melody = self.state.melody === null ? Rtttl.fromBluejayStartupMelody(self.props.value) : self.state.melody
+                    const melody = self.state.melody || Rtttl.fromBluejayStartupMelody(self.props.value)
+
                     const parsedRtttl = Rtttl.parse(melody)
-                    const audioCtx = new AudioContext()
-                    _playMelody(parsedRtttl.melody, audioCtx)
+                    _playMelody(parsedRtttl.melody)
                 } catch(err) {
                     alert(err)
                 }
             }
         })
 
-        function _playMelody(melody, audioCtx) {
+        function _playMelody(melody) {
             if (melody.length === 0 || !self.state.isPlaying) {
                 self.setState({ isPlaying: false })
                 return
             }
+ 
+            const audioCtx = new AudioContext()
+                 
             const osc = audioCtx.createOscillator()
             osc.type = 'square'
-            osc.start(0)
 
-            const note = melody[0]
-            osc.frequency.value = note.frequency
-            osc.connect(audioCtx.destination)
+            var volume = audioCtx.createGain();
+            osc.connect(volume);
+            volume.connect(audioCtx.destination);
+            volume.gain.value = 0.05;
 
-            setTimeout(() => {
-                osc.disconnect(audioCtx.destination)
-                _playMelody(melody.slice(1), audioCtx, osc)
-            }, note.duration)
+            // todo: decouple
+            const checkStop = setInterval(() => {
+                if (!self.state.isPlaying) osc.stop()
+            }, 100)
+
+            osc.onended = () => {
+                clearInterval(checkStop)
+                volume.disconnect(audioCtx.destination)
+                self.setState({ isPlaying: false })
+            }
+
+            let t = audioCtx.currentTime
+            for (const note of melody) {
+                osc.frequency.setValueAtTime(note.frequency, t)
+                t += note.duration / 1000
+            }
+            
+            osc.start(0);
+            osc.stop(t)
         }
     }
 });
