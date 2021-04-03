@@ -95,12 +95,12 @@ var Number = React.createClass({
 var Melody = React.createClass({
     getInitialState () {
         return {
-            isPlaying: false,
             melody: null
         };
     },
     render: function() {
         //TODO: Disable Accept button when state.melody === null || state.melody === props.value
+
         return (
             <div className="melody">
                 <label>
@@ -115,10 +115,20 @@ var Melody = React.createClass({
                     </span>
                     <span className="btn melody_btn">
                         <a
+                            className={this.props.isPlayingAll || (!this.props.isPlaying && this.props.isPlayingAny) ? 'disabled' : ''}
                             href="#"
                             onClick={this.togglePlayMelody}
                         >
-                            {this.state.isPlaying ? chrome.i18n.getMessage('escButtonStop') : chrome.i18n.getMessage('escButtonPlay')}
+                            {(this.props.isPlaying && !this.props.isPlayingAll) ? chrome.i18n.getMessage('escButtonStop') : chrome.i18n.getMessage('escButtonPlay')}
+                        </a>
+                    </span>
+                    <span className="btn melody_btn">
+                        <a
+                            className={(this.props.isPlaying && !this.props.isPlayingAll) || this.props.isPlayingAny ? 'disabled' : ''}
+                            href="#"
+                            onClick={this.togglePlayMelodyAll}
+                        >
+                            {(this.props.isPlayingAll) ? chrome.i18n.getMessage('escButtonStop') : chrome.i18n.getMessage('escButtonPlayAll')}
                         </a>
                     </span>
                     <textarea
@@ -154,57 +164,10 @@ var Melody = React.createClass({
             alert(err)
         }
     },
+    togglePlayMelodyAll: function() {
+        this.props.onPlayAll();
+    },
     togglePlayMelody: function() {
-        var self = this
-
-        this.setState({ isPlaying: !self.state.isPlaying }, function(){
-            if (self.state.isPlaying) {
-                try {
-                    const melody = self.state.melody || Rtttl.fromBluejayStartupMelody(self.props.value)
-
-                    const parsedRtttl = Rtttl.parse(melody)
-                    _playMelody(parsedRtttl.melody)
-                } catch(err) {
-                    alert(err)
-                }
-            }
-        })
-
-        function _playMelody(melody) {
-            if (melody.length === 0 || !self.state.isPlaying) {
-                self.setState({ isPlaying: false })
-                return
-            }
- 
-            const audioCtx = new AudioContext()
-                 
-            const osc = audioCtx.createOscillator()
-            osc.type = 'square'
-
-            var volume = audioCtx.createGain();
-            osc.connect(volume);
-            volume.connect(audioCtx.destination);
-            volume.gain.value = 0.05;
-
-            // todo: decouple
-            const checkStop = setInterval(() => {
-                if (!self.state.isPlaying) osc.stop()
-            }, 100)
-
-            osc.onended = () => {
-                clearInterval(checkStop)
-                volume.disconnect(audioCtx.destination)
-                self.setState({ isPlaying: false })
-            }
-
-            let t = audioCtx.currentTime
-            for (const note of melody) {
-                osc.frequency.setValueAtTime(note.frequency, t)
-                t += note.duration / 1000
-            }
-            
-            osc.start(0);
-            osc.stop(t)
-        }
+        this.props.onPlay();
     }
 });

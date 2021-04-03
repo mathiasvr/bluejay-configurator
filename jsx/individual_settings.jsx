@@ -132,6 +132,11 @@ var IndividualSettings = React.createClass({
                         label={desc.label}
                         melodyLength={desc.melodyLength}
                         onChange={this.handleChange}
+                        onPlay={this.handlePlayMelody}
+                        onPlayAll={this.handlePlayMelodyAll}
+                        isPlaying={this.props.isPlaying[this.props.escIndex] || false}
+                        isPlayingAll={this.props.isPlayingAll}
+                        isPlayingAny={this.props.isPlayingAny}
                     />
                 );
             }
@@ -167,6 +172,12 @@ var IndividualSettings = React.createClass({
         var escSettings = this.props.escSettings;
         escSettings[this.props.escIndex][name] = value;
         this.props.onUserInput(escSettings);
+    },
+    handlePlayMelody: function() {
+      this.props.onPlayMelody(this.props.escIndex);
+    },
+    handlePlayMelodyAll: function() {
+      this.props.onPlayMelodyAll();
     },
     flashFirmware: function() {
         this.props.onFlash(this.props.escIndex);
