@@ -396,6 +396,12 @@
     "playStartupMusic": {
         "message": "Play Startup Music"
     },
+    "errorMelodyTooLong": {
+        "message": "Unable to fit the melody into Bluejay startup melody"
+    },
+    "errorCantConvertMelodyNotes": {
+        "message": "Unable to convert certain notes to Bluejay startup melody"
+    },
 
     "resetDefaults": {
         "message": "Defaults"

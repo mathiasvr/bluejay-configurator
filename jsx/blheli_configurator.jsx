@@ -1206,6 +1206,7 @@ var Configurator = React.createClass({
                     onFlash={this.flashOne}
                     doPlayMusic={this.state.doPlayMusic}
                     onMusicPlaybackStateChanged={this.onMusicPlaybackStateChanged}
+                    GUI={GUI}
                 />
             );
         });
