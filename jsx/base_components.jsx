@@ -161,50 +161,41 @@ var Melody = React.createClass({
             if (self.state.isPlaying) {
                 try {
                     const melody = self.state.melody || Rtttl.fromBluejayStartupMelody(self.props.value)
+                    const parsedRtttl = Rtttl.parse(melody).melody
 
-                    const parsedRtttl = Rtttl.parse(melody)
-                    _playMelody(parsedRtttl.melody)
+                    let audioContext = new AudioContext()
+                    let osc = audioContext.createOscillator()
+                    let volume = audioContext.createGain()
+                    self.osc = osc
+
+                    osc.type = 'square'
+                    osc.connect(volume)
+                    volume.gain.value = 0.05
+
+                    osc.onended = () => {
+                        self.setState({ isPlaying: false })
+                        volume.disconnect(audioContext.destination)
+                    }
+                    volume.connect(audioContext.destination)
+
+                    let t = audioContext.currentTime
+                    for (const note of parsedRtttl) {
+                        osc.frequency.setValueAtTime(note.frequency, t)
+                        t += note.duration / 1000
+                    }
+
+                    self.osc.start(0)
+                    self.osc.stop(t)
                 } catch(err) {
                     alert(err)
                 }
             }
+            else {
+                if (self.osc) {
+                    self.osc.stop()
+                    self.osc = null
+                }
+            }
         })
-
-        function _playMelody(melody) {
-            if (melody.length === 0 || !self.state.isPlaying) {
-                self.setState({ isPlaying: false })
-                return
-            }
- 
-            const audioCtx = new AudioContext()
-                 
-            const osc = audioCtx.createOscillator()
-            osc.type = 'square'
-
-            var volume = audioCtx.createGain();
-            osc.connect(volume);
-            volume.connect(audioCtx.destination);
-            volume.gain.value = 0.05;
-
-            // todo: decouple
-            const checkStop = setInterval(() => {
-                if (!self.state.isPlaying) osc.stop()
-            }, 100)
-
-            osc.onended = () => {
-                clearInterval(checkStop)
-                volume.disconnect(audioCtx.destination)
-                self.setState({ isPlaying: false })
-            }
-
-            let t = audioCtx.currentTime
-            for (const note of melody) {
-                osc.frequency.setValueAtTime(note.frequency, t)
-                t += note.duration / 1000
-            }
-            
-            osc.start(0);
-            osc.stop(t)
-        }
     }
 });
