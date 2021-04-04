@@ -102,7 +102,7 @@ var Melody = React.createClass({
     },
     componentDidUpdate(prevProps) {
         if (prevProps.doPlayMusic != this.props.doPlayMusic) {
-            if (this.props.doPlayMusic) {
+            if (this.props.doPlayMusic && !this.state.isPlaying) {
                 this.playMelody()
             } else {
                 this.stopMelody()
@@ -229,6 +229,12 @@ var Melody = React.createClass({
     stopMelody: function() {
         if (this.state.osc) {
             this.state.osc.stop()
+        } else {
+            this.setState({
+                isPlaying: false,
+                osc: null
+            })
+            this.props.onPlaybackStateChanged(false)
         }
     }
 });
