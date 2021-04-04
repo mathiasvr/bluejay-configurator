@@ -1,7 +1,7 @@
 'use strict';
 
 var BLUEJAY_DEFAULTS = {
-	'203': { // only adds damping mode
+	'203': { //  201 with STARTUP_MELODY
 		RPM_POWER_SLOPE:            9,
 		MOTOR_DIRECTION:            1,
 		COMMUTATION_TIMING:         4,
@@ -14,11 +14,9 @@ var BLUEJAY_DEFAULTS = {
 		LED_CONTROL:                0,
 
 		STARTUP_POWER_MIN:          51,
-		STARTUP_BEEP:               1,
 		DITHERING:                  1,
 
 		STARTUP_POWER_MAX:          25,
-		DAMPING_MODE:               2,
 		STARTUP_MELODY:             [2,58,4,32,52,66,13,0,69,45,13,0,52,66,13,0,78,39,211,0,69,45,208,25,52,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	},
 	'202': { // only adds damping mode
