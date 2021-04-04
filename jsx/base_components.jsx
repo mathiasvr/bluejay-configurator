@@ -135,6 +135,8 @@ var Melody = React.createClass({
                         name={this.props.name}
                         value={this.getDisplayValue()}
                         onChange={this.handleChange}
+                        selectionStart="0"
+                        selectionEnd="2"
                     />
                 </label>
             </div>
@@ -176,7 +178,7 @@ var Melody = React.createClass({
                 self.props.GUI.log(chrome.i18n.getMessage('errorMelodyTooLong'))
             }
         } catch (err) {
-            alert(err)
+            alert(chrome.i18n.getMessage('errorParsingRtttl'))
         }
     },
     togglePlayMelody: function() {
@@ -226,7 +228,7 @@ var Melody = React.createClass({
             })
             this.props.onPlaybackStateChanged(true)
         } catch(err) {
-            alert(err)
+            alert(chrome.i18n.getMessage('errorParsingRtttl'))
         }
     },
     stopMelody: function() {

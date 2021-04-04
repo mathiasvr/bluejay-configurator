@@ -396,6 +396,9 @@
     "playStartupMusic": {
         "message": "Play Startup Music"
     },
+    "errorParsingRtttl": {
+        "message": "Unable to parse the Rtttl"
+    },
     "errorMelodyTooLong": {
         "message": "Unable to fit the melody into Bluejay startup melody"
     },
