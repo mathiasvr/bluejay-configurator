@@ -112,7 +112,7 @@ var Configurator = React.createClass({
             canWrite: availableSettings.length > 0,
             canFlash: availableSettings.length > 0 && canFlash,
             canResetDefaults: canResetDefaults,
-            isMelodyEditorShown: false,
+            isMelodyEditorShown: this.state.isMelodyEditorShown || false,
             canPlayMusic: canPlayMusic,
             isPlayingMusic: false,
             doPlayMusic: false,
