@@ -107,7 +107,7 @@ var Configurator = React.createClass({
         // Enable `Flash All` if all ESCs are identical
         const canFlash = isOpenEsc ? availableSettings.every(settings => settings.LAYOUT_REVISION === availableSettings[0].LAYOUT_REVISION) : availableSettings.every(settings => settings.LAYOUT === availableSettings[0].LAYOUT);
         const canResetDefaults = isOpenEsc || isBluejay || availableSettings.every(settings => settings.LAYOUT_REVISION > BLHELI_S_MIN_LAYOUT_REVISION);
-        const canPlayMusic = availableSettings.every(settings => settings.STARTUP_MELODY && settings.STARTUP_MELODY.length > 0);
+        const canPlayMusic = isBluejay && availableSettings.map(s => BLUEJAY_INDIVIDUAL_SETTINGS_DESCRIPTIONS[s.LAYOUT_REVISION]).every(x => x['base'].find(x => x.name === 'STARTUP_MELODY')) && availableSettings.every(settings => settings.STARTUP_MELODY.length > 0);
 
         this.setState({
             canRead: true,
