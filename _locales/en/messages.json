@@ -394,7 +394,7 @@
         "message": "Stop"
     },
     "playStartupMusic": {
-        "message": "Play Startup Music"
+        "message": "Play All"
     },
     "errorParsingRtttl": {
         "message": "Unable to parse the Rtttl"
