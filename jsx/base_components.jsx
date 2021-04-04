@@ -110,9 +110,8 @@ var Melody = React.createClass({
         }
     },
     render: function() {
-        //TODO: Disable Accept button when state.melody === null || state.melody === props.value
         return (
-            <div className="melody">
+            <div className={this.props.isMelodyEditorShown? "melody" : "hidden"}>
                 <label>
                     <span className={this.props.notInSync ? "not-in-sync label" : "label"}>{hacks(this.props.label)}</span>
                     <span className="btn melody_btn">
@@ -135,8 +134,6 @@ var Melody = React.createClass({
                         name={this.props.name}
                         value={this.getDisplayValue()}
                         onChange={this.handleChange}
-                        selectionStart="0"
-                        selectionEnd="2"
                     />
                 </label>
             </div>

@@ -405,6 +405,9 @@
     "errorCantConvertMelodyNotes": {
         "message": "Unable to convert certain notes to Bluejay startup melody"
     },
+    "showMelodyEditor": {
+        "message": "Show Melody Editor"
+    },
 
     "resetDefaults": {
         "message": "Defaults"

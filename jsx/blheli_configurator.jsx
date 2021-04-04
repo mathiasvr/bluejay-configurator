@@ -112,6 +112,7 @@ var Configurator = React.createClass({
             canWrite: availableSettings.length > 0,
             canFlash: availableSettings.length > 0 && canFlash,
             canResetDefaults: canResetDefaults,
+            isMelodyEditorShown: false,
             canPlayMusic: canPlayMusic,
             isPlayingMusic: false,
             doPlayMusic: false,
@@ -1058,6 +1059,17 @@ var Configurator = React.createClass({
                             {chrome.i18n.getMessage('escButtonSaveLog')}
                         </a>
                     </div>
+                    <div className={this.state.canPlayMusic ? "showMelodyEditorCheckbox" : "hidden"}>
+                        <label className="showMelodyEditorCheckboxContents">
+                            <input
+                                type="checkbox"
+                                name="showMelodyEditor"
+                                checked={this.state.isMelodyEditorShown}
+                                onChange={this.toggleShowMelodyEditor}
+                            />
+                            <span>{chrome.i18n.getMessage("showMelodyEditor")}</span>
+                        </label>
+                    </div>
                     <div className="btn">
                         <a
                             href="#"
@@ -1106,6 +1118,9 @@ var Configurator = React.createClass({
                 </div>
             </div>
         );
+    },
+    toggleShowMelodyEditor: function() {
+        this.setState({ isMelodyEditorShown: !this.state.isMelodyEditorShown });
     },
     togglePlayStartupMusic: function() {
         this.setState({ doPlayMusic: !this.state.doPlayMusic });
@@ -1204,6 +1219,7 @@ var Configurator = React.createClass({
                     isFlashing={this.state.flashingEscIndex === idx}
                     progress={this.state.flashingEscProgress}
                     onFlash={this.flashOne}
+                    isMelodyEditorShown={this.state.isMelodyEditorShown}
                     doPlayMusic={this.state.doPlayMusic}
                     onMusicPlaybackStateChanged={this.onMusicPlaybackStateChanged}
                     GUI={GUI}
