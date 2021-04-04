@@ -116,6 +116,7 @@ var Configurator = React.createClass({
             canPlayMusic: canPlayMusic,
             isPlayingMusic: false,
             doPlayMusic: false,
+            doStopMusic: false,
             musicPlaybackStatus: (new Array(this.state.escSettings.length)).fill(false)
         });
 
@@ -1123,7 +1124,18 @@ var Configurator = React.createClass({
         this.setState({ isMelodyEditorShown: !this.state.isMelodyEditorShown });
     },
     togglePlayStartupMusic: function() {
-        this.setState({ doPlayMusic: !this.state.doPlayMusic });
+        if (this.state.isPlayingMusic) {
+            this.setState({
+                doStopMusic: true,
+                doPlayMusic: false
+
+            });
+        } else {
+            this.setState({
+                doPlayMusic: true,
+                doStopMusic: false
+            });
+        }
     },
     renderContent: function() {
         const noneAvailable = !this.state.escMetainfo.some(info => info.available);
@@ -1221,6 +1233,7 @@ var Configurator = React.createClass({
                     onFlash={this.flashOne}
                     isMelodyEditorShown={this.state.isMelodyEditorShown}
                     doPlayMusic={this.state.doPlayMusic}
+                    doStopMusic={this.state.doStopMusic}
                     onMusicPlaybackStateChanged={this.onMusicPlaybackStateChanged}
                     GUI={GUI}
                 />
@@ -1231,15 +1244,17 @@ var Configurator = React.createClass({
         let musicPlaybackStatus = this.state.musicPlaybackStatus;
         musicPlaybackStatus[escIndex] = isPlaying;
         let isPlayingMusic = musicPlaybackStatus.some((a) => a)
-
-        this.setState({
+        let newState = {
             musicPlaybackStatus: musicPlaybackStatus,
-            isPlayingMusic: isPlayingMusic,
-        })
-        
-        if (!isPlayingMusic) {
-            this.setState({doPlayMusic: false})
+            isPlayingMusic: isPlayingMusic
         }
+
+        if (!isPlayingMusic) {
+            newState.doPlayMusic = false
+            newState.doStopMusic = false
+        }
+
+        this.setState(newState)
     },
     onFirmwareLoaded: function(hex, eep) {
         this.setState({

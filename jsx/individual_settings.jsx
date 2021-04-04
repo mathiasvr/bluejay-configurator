@@ -134,6 +134,7 @@ var IndividualSettings = React.createClass({
                         onChange={this.handleChange}
                         isMelodyEditorShown={this.props.isMelodyEditorShown}
                         doPlayMusic={this.props.doPlayMusic}
+                        doStopMusic={this.props.doStopMusic}
                         onPlaybackStateChanged={this.handlePlaybackStateChange}
                         GUI={this.props.GUI}
                     />

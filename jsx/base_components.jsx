@@ -95,18 +95,21 @@ var Number = React.createClass({
 var Melody = React.createClass({
     getInitialState () {
         return {
-            isPlaying: false,
             melody: null,
             osc: null
         };
     },
     componentDidUpdate(prevProps) {
-        if (prevProps.doPlayMusic != this.props.doPlayMusic) {
-            if (this.props.doPlayMusic && !this.state.isPlaying) {
-                this.playMelody()
-            } else {
-                this.stopMelody()
-            }
+        if (!this || !this.props) {
+            return
+        }
+
+        if (prevProps.doPlayMusic != this.props.doPlayMusic && this.props.doPlayMusic) {
+            this.playMelody()
+        } else if (prevProps.doStopMusic != this.props.doStopMusic && this.props.doStopMusic) {
+            this.stopMelody()
+        } else {
+            //Do Nothing
         }
     },
     render: function() {
@@ -127,7 +130,7 @@ var Melody = React.createClass({
                             href="#"
                             onClick={this.togglePlayMelody}
                         >
-                            {this.state.isPlaying ? chrome.i18n.getMessage('escButtonStop') : chrome.i18n.getMessage('escButtonPlay')}
+                            {this.state.osc? chrome.i18n.getMessage('escButtonStop') : chrome.i18n.getMessage('escButtonPlay')}
                         </a>
                     </span>
                     <textarea
@@ -179,13 +182,17 @@ var Melody = React.createClass({
         }
     },
     togglePlayMelody: function() {
-        if (!this.state.isPlaying) {
-            this.playMelody()
-        } else {
+        if (this.state.osc) {
             this.stopMelody()
+        } else {
+            this.playMelody()
         }
     },
     playMelody: function() {
+        if (this.state.osc) {
+            this.props.onPlaybackStateChanged(true)
+            return
+        }
         try {
             const melody = this.state.melody || Rtttl.fromBluejayStartupMelody(this.props.value)
             const parsedRtttl = Rtttl.parse(melody).melody
@@ -193,48 +200,37 @@ var Melody = React.createClass({
             let audioContext = new AudioContext()
             let osc = audioContext.createOscillator()
             let volume = audioContext.createGain()
-            this.osc = osc
 
             osc.type = 'square'
             osc.connect(volume)
             volume.gain.value = 0.05
 
-            osc.onended = () => {
-                volume.disconnect(audioContext.destination)
-                this.setState({
-                    isPlaying: false,
-                    osc: null
-                })
-                this.props.onPlaybackStateChanged(false)
-            }
             volume.connect(audioContext.destination)
-
             let t = audioContext.currentTime
             for (const note of parsedRtttl) {
                 osc.frequency.setValueAtTime(note.frequency, t)
                 t += note.duration / 1000
             }
-
             osc.start(0)
             osc.stop(t)
-            this.setState({
-                isPlaying: true,
-                osc: osc
+
+            osc.onended = () => {
+                audioContext.close()
+                this.setState({ osc: null })
+                this.props.onPlaybackStateChanged(false)
+            }
+
+            this.setState({ osc: osc }, () => {
+                this.props.onPlaybackStateChanged(true)
             })
-            this.props.onPlaybackStateChanged(true)
         } catch(err) {
             alert(chrome.i18n.getMessage('errorParsingRtttl'))
+            this.props.onPlaybackStateChanged(false)
         }
     },
     stopMelody: function() {
         if (this.state.osc) {
             this.state.osc.stop()
-        } else {
-            this.setState({
-                isPlaying: false,
-                osc: null
-            })
-            this.props.onPlaybackStateChanged(false)
         }
     }
 });
