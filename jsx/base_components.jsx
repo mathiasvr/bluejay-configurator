@@ -186,16 +186,14 @@ var Melody = React.createClass({
         }
     },
     playMelody: function() {
-        let self = this
-
         try {
-            const melody = self.state.melody || Rtttl.fromBluejayStartupMelody(self.props.value)
+            const melody = this.state.melody || Rtttl.fromBluejayStartupMelody(this.props.value)
             const parsedRtttl = Rtttl.parse(melody).melody
 
             let audioContext = new AudioContext()
             let osc = audioContext.createOscillator()
             let volume = audioContext.createGain()
-            self.osc = osc
+            this.osc = osc
 
             osc.type = 'square'
             osc.connect(volume)
@@ -203,11 +201,11 @@ var Melody = React.createClass({
 
             osc.onended = () => {
                 volume.disconnect(audioContext.destination)
-                self.setState({
+                this.setState({
                     isPlaying: false,
                     osc: null
                 })
-                self.props.onPlaybackStateChanged(false)
+                this.props.onPlaybackStateChanged(false)
             }
             volume.connect(audioContext.destination)
 
