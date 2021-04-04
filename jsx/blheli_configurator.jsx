@@ -170,12 +170,20 @@ var Configurator = React.createClass({
 
                 googleAnalytics.sendEvent('ESC', 'VERSION', settings.MAIN_REVISION + '.' + settings.SUB_REVISION);
                 googleAnalytics.sendEvent('ESC', 'LAYOUT', settings.LAYOUT ? settings.LAYOUT.replace(/#/g, '') : `Arm_${settings.LAYOUT_REVISION}`);
-                googleAnalytics.sendEvent('ESC', 'MODE', settings.MODE ? blheliModeToString(settings.MODE) : null);
+                // googleAnalytics.sendEvent('ESC', 'MODE', settings.MODE ? blheliModeToString(settings.MODE) : null);
                 googleAnalytics.sendEvent('ESC', 'COMMUTATION_TIMING', settings.COMMUTATION_TIMING);
                 googleAnalytics.sendEvent('ESC', 'DEMAG_COMPENSATION', settings.DEMAG_COMPENSATION);
-                googleAnalytics.sendEvent('ESC', 'STARTUP_POWER', settings.STARTUP_POWER);
-                googleAnalytics.sendEvent('ESC', 'PPM_MIN_THROTTLE', settings.PPM_MIN_THROTTLE);
-                googleAnalytics.sendEvent('ESC', 'PPM_MAX_THROTTLE', settings.PPM_MAX_THROTTLE);
+                googleAnalytics.sendEvent('ESC', 'STARTUP_POWER_MIN', settings.STARTUP_POWER_MIN);
+                googleAnalytics.sendEvent('ESC', 'STARTUP_POWER_MAX', settings.STARTUP_POWER_MAX);
+                googleAnalytics.sendEvent('ESC', 'PWM_FREQUENCY', settings.PWM_FREQUENCY);
+                googleAnalytics.sendEvent('ESC', 'DITHERING', settings.DITHERING);
+                googleAnalytics.sendEvent('ESC', 'RPM_POWER_SLOPE', settings.RPM_POWER_SLOPE);
+                googleAnalytics.sendEvent('ESC', 'BEACON_STRENGTH', settings.BEACON_STRENGTH);
+                googleAnalytics.sendEvent('ESC', 'BEACON_DELAY', settings.BEACON_DELAY);
+                googleAnalytics.sendEvent('ESC', 'TEMPERATURE_PROTECTION', settings.TEMPERATURE_PROTECTION);
+                googleAnalytics.sendEvent('ESC', 'BRAKE_ON_STOP', settings.BRAKE_ON_STOP);
+                // googleAnalytics.sendEvent('ESC', 'PPM_MIN_THROTTLE', settings.PPM_MIN_THROTTLE);
+                // googleAnalytics.sendEvent('ESC', 'PPM_MAX_THROTTLE', settings.PPM_MAX_THROTTLE);
 
                 if (isSiLabs) {
                     await _4way.reset(esc);
