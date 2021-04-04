@@ -159,7 +159,7 @@ var Melody = React.createClass({
             let startupMelody = bluejayStartupMelody.data
             var self = this
             // Update the displayValue so we are looking at the accepted melody
-            this.setState({melody: Rtttl.fromBluejayStartupMelody(startupMelody)}, function(){
+            this.setState({melody: null}, function(){
                 self.props.onChange(self.props.name, startupMelody);
             })
 
