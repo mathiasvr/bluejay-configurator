@@ -273,18 +273,15 @@
 
 .showMelodyEditorCheckbox {
     float: left;
-    margin-left: 15px;
-    width: 200px;
-    height: 20px;
-    margin: 1px;
-}
-
-.centeredContents {
-    transform: translateY(-50%);
-    top: 50%;
-    position: absolute;
+    padding: 5px 0;
 }
 
 .showMelodyEditorCheckboxContents span {
     padding-left: 5px;
+    vertical-align: middle;
+    line-height: 13px;
+}
+
+.showMelodyEditorCheckboxContents input[type="checkbox"] {
+    vertical-align: middle;
 }
