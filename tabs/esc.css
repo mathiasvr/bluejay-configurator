@@ -59,7 +59,7 @@
     -webkit-box-sizing: border-box;
     width: 100%;
     margin-top: 8px;
-    height: 22px;
+    height: 50px;
     line-height: 20px;
     padding-left: 5px;
     border: 1px solid silver;
@@ -232,4 +232,56 @@
 
 .tab-esc .red {
     color: red;
+}
+
+.tab-esc .melody_btn {
+    float: right;
+    width: 100px;
+    height: 20px;
+    background: #5929aa;
+    border: 1px solid #5929aa;
+    border-radius: 5px;
+    margin: 1px;
+}
+
+.tab-esc .melody_btn a:hover {
+    background-color: #6a35c4;
+    transition: all ease 0.2s;
+}
+
+.tab-esc .melody_btn a:active {
+    background-color: #4d2493;
+    transition: all ease 0.0s;
+    box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.35);
+}
+
+.tab-esc .melody_btn a.disabled {
+    cursor: default;
+    color: #fff;
+    background-color: #AFAFAF;
+    border: 1px solid #AFAFAF;
+    pointer-events: none;
+    text-shadow: none;
+    opacity: 0.5;
+}
+
+.tab-esc .melody_btn a {
+    display: block;
+    text-align: center;
+    color: white;
+}
+
+.showMelodyEditorCheckbox {
+    float: left;
+    padding: 5px 0;
+}
+
+.showMelodyEditorCheckboxContents span {
+    padding-left: 5px;
+    vertical-align: middle;
+    line-height: 13px;
+}
+
+.showMelodyEditorCheckboxContents input[type="checkbox"] {
+    vertical-align: middle;
 }

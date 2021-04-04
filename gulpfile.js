@@ -180,6 +180,7 @@ function do_dist() {
         './js/libraries/jbox/jBox.min.js',
         './js/libraries/switchery/switchery.js',
         './js/workers/hex_parser.js',
+        './js/rtttl.js',
         './js/debug.js',
         './js/flashing_helpers.js',
         './js/port_handler.js',

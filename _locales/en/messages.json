@@ -378,6 +378,37 @@
         "message": "Flashing <span class=\"message-negative\">failed</span>: <strong>$1</strong>"
     },
 
+    "startupMelody": {
+        "message": "Startup Melody"
+    },
+    "escButtonPlay": {
+        "message": "Play"
+    },
+    "escButtonStop": {
+        "message": "Stop"
+    },
+    "escButtonAccept": {
+        "message": "Accept"
+    },
+    "stopStartupMusic": {
+        "message": "Stop"
+    },
+    "playStartupMusic": {
+        "message": "Play All"
+    },
+    "errorParsingRtttl": {
+        "message": "Unable to parse the Rtttl"
+    },
+    "errorMelodyTooLong": {
+        "message": "Unable to fit the melody into Bluejay startup melody"
+    },
+    "errorCantConvertMelodyNotes": {
+        "message": "Unable to convert certain notes to Bluejay startup melody"
+    },
+    "showMelodyEditor": {
+        "message": "Show Melody Editor"
+    },
+
     "resetDefaults": {
         "message": "Defaults"
     }

@@ -23,7 +23,9 @@ var Configurator = React.createClass({
             ignoreMCULayout: false,
 
             flashingEscIndex: undefined,
-            flashingEscProgress: 0
+            flashingEscProgress: 0,
+
+            currentSettingsInstanceId: 0
         };
     },
     componentWillMount: function() {
@@ -105,12 +107,20 @@ var Configurator = React.createClass({
         // Enable `Flash All` if all ESCs are identical
         const canFlash = isOpenEsc ? availableSettings.every(settings => settings.LAYOUT_REVISION === availableSettings[0].LAYOUT_REVISION) : availableSettings.every(settings => settings.LAYOUT === availableSettings[0].LAYOUT);
         const canResetDefaults = isOpenEsc || isBluejay || availableSettings.every(settings => settings.LAYOUT_REVISION > BLHELI_S_MIN_LAYOUT_REVISION);
+        const canPlayMusic = availableSettings.every(settings => settings.STARTUP_MELODY && settings.STARTUP_MELODY.length > 0);
 
         this.setState({
             canRead: true,
             canWrite: availableSettings.length > 0,
             canFlash: availableSettings.length > 0 && canFlash,
-            canResetDefaults: canResetDefaults
+            canResetDefaults: canResetDefaults,
+            isMelodyEditorShown: this.state.isMelodyEditorShown || false,
+            canPlayMusic: canPlayMusic,
+            isPlayingMusic: false,
+            doPlayMusic: false,
+            doStopMusic: false,
+            musicPlaybackStatus: (new Array(this.state.escSettings.length)).fill(false),
+            currentSettingsInstanceId: this.state.currentSettingsInstanceId + 1
         });
 
         $('a.connect').removeClass('disabled');
@@ -1061,6 +1071,17 @@ var Configurator = React.createClass({
                             {chrome.i18n.getMessage('escButtonSaveLog')}
                         </a>
                     </div>
+                    <div className={this.state.canPlayMusic ? "showMelodyEditorCheckbox" : "hidden"}>
+                        <label className="showMelodyEditorCheckboxContents">
+                            <input
+                                type="checkbox"
+                                name="showMelodyEditor"
+                                checked={this.state.isMelodyEditorShown}
+                                onChange={this.toggleShowMelodyEditor}
+                            />
+                            <span>{chrome.i18n.getMessage("showMelodyEditor")}</span>
+                        </label>
+                    </div>
                     <div className="btn">
                         <a
                             href="#"
@@ -1097,9 +1118,35 @@ var Configurator = React.createClass({
                             {chrome.i18n.getMessage('resetDefaults')}
                         </a>
                     </div>
+                    <div className={this.state.isMelodyEditorShown ? "btn" : "hidden"}>
+                        <a
+                            href="#"
+                            className={!this.state.selectingFirmware && !this.state.IsFlashing && this.state.canWrite ? "" : "disabled"}
+                            onClick={this.togglePlayStartupMusic}
+                        >
+                            {chrome.i18n.getMessage(this.state.isPlayingMusic ? "stopStartupMusic": "playStartupMusic")}
+                        </a>
+                    </div>
                 </div>
             </div>
         );
+    },
+    toggleShowMelodyEditor: function() {
+        this.setState({ isMelodyEditorShown: !this.state.isMelodyEditorShown });
+    },
+    togglePlayStartupMusic: function() {
+        if (this.state.isPlayingMusic) {
+            this.setState({
+                doStopMusic: true,
+                doPlayMusic: false
+
+            });
+        } else {
+            this.setState({
+                doPlayMusic: true,
+                doStopMusic: false
+            });
+        }
     },
     renderContent: function() {
         const noneAvailable = !this.state.escMetainfo.some(info => info.available);
@@ -1172,6 +1219,7 @@ var Configurator = React.createClass({
                 supportedBlheliESCs={this.state.supportedBlheliESCs}
                 supportedOpenEscESCs={this.state.supportedOpenEscESCs}
                 supportedBluejayESCs={this.state.supportedBluejayESCs}
+                currentSettingsInstanceId={this.state.currentSettingsInstanceId}
                 onUserInput={this.onUserInput}
             />
         );
@@ -1195,9 +1243,31 @@ var Configurator = React.createClass({
                     isFlashing={this.state.flashingEscIndex === idx}
                     progress={this.state.flashingEscProgress}
                     onFlash={this.flashOne}
+                    isMelodyEditorShown={this.state.isMelodyEditorShown}
+                    doPlayMusic={this.state.doPlayMusic}
+                    doStopMusic={this.state.doStopMusic}
+                    currentSettingsInstanceId={this.state.currentSettingsInstanceId}
+                    onMusicPlaybackStateChanged={this.onMusicPlaybackStateChanged}
+                    GUI={GUI}
                 />
             );
         });
+    },
+    onMusicPlaybackStateChanged: function(escIndex, isPlaying) {
+        let musicPlaybackStatus = this.state.musicPlaybackStatus;
+        musicPlaybackStatus[escIndex] = isPlaying;
+        let isPlayingMusic = musicPlaybackStatus.some((a) => a)
+        let newState = {
+            musicPlaybackStatus: musicPlaybackStatus,
+            isPlayingMusic: isPlayingMusic
+        }
+
+        if (!isPlayingMusic) {
+            newState.doPlayMusic = false
+            newState.doStopMusic = false
+        }
+
+        this.setState(newState)
     },
     onFirmwareLoaded: function(hex, eep) {
         this.setState({

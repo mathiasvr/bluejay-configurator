@@ -129,6 +129,23 @@ var IndividualSettings = React.createClass({
                     />
                 );
             }
+            case 'melody': {
+                return (
+                    <Melody
+                        name={desc.name}
+                        value={settings[desc.name]}
+                        label={desc.label}
+                        melodyLength={desc.melodyLength}
+                        onChange={this.handleChange}
+                        isMelodyEditorShown={this.props.isMelodyEditorShown}
+                        doPlayMusic={this.props.doPlayMusic}
+                        doStopMusic={this.props.doStopMusic}
+                        onPlaybackStateChanged={this.handlePlaybackStateChange}
+                        currentSettingsInstanceId={this.props.currentSettingsInstanceId}
+                        GUI={this.props.GUI}
+                    />
+                );
+            }
             default: throw new Error('Logic error');
         }
     },
@@ -161,6 +178,9 @@ var IndividualSettings = React.createClass({
         var escSettings = this.props.escSettings;
         escSettings[this.props.escIndex][name] = value;
         this.props.onUserInput(escSettings);
+    },
+    handlePlaybackStateChange: function(isPlaying) {
+        this.props.onMusicPlaybackStateChanged(this.props.escIndex, isPlaying);
     },
     flashFirmware: function() {
         this.props.onFlash(this.props.escIndex);

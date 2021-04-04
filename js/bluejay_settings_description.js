@@ -5,16 +5,90 @@
 // todo: remove multi
 var BLUEJAY_SETTINGS_DESCRIPTIONS = {
 
+    '203': { //  201 With Bluejay startup tunes
+        MULTI: {
+            base:
+            [
+                {
+                    name: 'STARTUP_POWER_MIN', type: 'number', label: '_Minimum Startup Power (Boost)',
+                    min: 1000, max: 1125, step: 5, displayFactor: 1000 / 2047, displayOffset: 1000, displayPrecision: 0
+                },
+                {
+                    name: 'STARTUP_POWER_MAX', type: 'number', label: '_Maximum Startup Power (Protection)',
+                    // Note: The real displayFactor is 1000 / 255 but 250 makes the slider nicer to work with minimal loss of accuracy
+                    min: 1004, max: 1300, step: 4, displayFactor: 1000 / 250, displayOffset: 1000, displayPrecision: 0
+                },
+                {
+                    name: 'TEMPERATURE_PROTECTION', type: 'enum', label: 'escTemperatureProtection',
+                    options: [
+                        { value: '0', label: 'Disabled' }, { value: '1', label: '80 C' },
+                        { value: '2', label: '90 C' }, { value: '3', label: '100 C' },
+                        { value: '4', label: '110 C' }, { value: '5', label: '120 C' },
+                        { value: '6', label: '130 C' }, { value: '7', label: '140 C' }
+                    ]
+                },
+                {
+                    name: 'COMMUTATION_TIMING', type: 'enum', label: 'escMotorTiming',
+                    options: [
+                        { value: '1', label: '0° (Low)' }, { value: '2', label: '7.5° (MediumLow)' },
+                        { value: '3', label: '15° (Medium)' }, { value: '4', label: '22.5° (MediumHigh)' },
+                        { value: '5', label: '30° (High)' }
+                    ]
+                },
+                {
+                    name: 'DEMAG_COMPENSATION', type: 'enum', label: 'escDemagCompensation',
+                    options: [
+                        { value: '1', label: 'Off' }, { value: '2', label: 'Low' },
+                        { value: '3', label: 'High' }
+                    ]
+                },
+                {
+                    name: 'RPM_POWER_SLOPE', type: 'enum', options: [
+                        { value:  '1', label: '1x (More protection)' },
+                        { value:  '2', label: '2x' }, { value: '3', label: '3x' },
+                        { value:  '4', label: '4x' }, { value: '5', label: '5x' },
+                        { value:  '6', label: '6x' },
+                        { value:  '7', label: '7x' }, { value: '8', label:  '8x' },
+                        { value:  '9', label: '9x' }, { value: '10', label: '10x' },
+                        { value: '11', label: '11x' }, { value: '12', label: '12x' },
+                        { value: '13', label: '13x (Less protection)' }, { value: '0', label: 'Off' }
+                    ],
+                    label: '_RPM Power Protection (Rampup)'
+                },
+                {
+                    name: 'BEEP_STRENGTH', type: 'number', min: 0, max: 255, step: 1, label: 'escBeepStrength'
+                },
+                {
+                    name: 'BEACON_STRENGTH', type: 'number', min: 0, max: 255, step: 1, label: 'escBeaconStrength'
+                },
+                {
+                    name: 'BEACON_DELAY', type: 'enum', label: 'escBeaconDelay',
+                    options: [
+                        { value: '1', label: '1 minute' }, { value: '2', label: '2 minutes' },
+                        { value: '3', label: '5 minutes' }, { value: '4', label: '10 minutes' },
+                        { value: '5', label: 'Infinite' }
+                    ]
+                },
+                {
+                    name: 'DITHERING', type: 'bool', label: 'escDithering'
+                },
+                {
+                    name: 'BRAKE_ON_STOP', type: 'bool', label: 'escBrakeOnStop'
+                }
+            ]
+        }
+    },
+
     '202': { //  only adds damping mode
         MULTI: {
             base:
             [
                 {
-                    name: 'STARTUP_POWER_MIN', type: 'number', label: '_Minimum Startup Power (Boost)', 
+                    name: 'STARTUP_POWER_MIN', type: 'number', label: '_Minimum Startup Power (Boost)',
                     min: 1000, max: 1125, step: 5, displayFactor: 1000 / 2047, displayOffset: 1000, displayPrecision: 0
                 },
                 {
-                    name: 'STARTUP_POWER_MAX', type: 'number', label: '_Maximum Startup Power (Protection)', 
+                    name: 'STARTUP_POWER_MAX', type: 'number', label: '_Maximum Startup Power (Protection)',
                     // Note: The real displayFactor is 1000 / 255 but 250 makes the slider nicer to work with minimal loss of accuracy
                     min: 1004, max: 1300, step: 4, displayFactor: 1000 / 250, displayOffset: 1000, displayPrecision: 0
                 },
@@ -95,11 +169,11 @@ var BLUEJAY_SETTINGS_DESCRIPTIONS = {
             base:
             [
                 {
-                    name: 'STARTUP_POWER_MIN', type: 'number', label: '_Minimum Startup Power (Boost)', 
+                    name: 'STARTUP_POWER_MIN', type: 'number', label: '_Minimum Startup Power (Boost)',
                     min: 1000, max: 1125, step: 5, displayFactor: 1000 / 2047, displayOffset: 1000, displayPrecision: 0
                 },
                 {
-                    name: 'STARTUP_POWER_MAX', type: 'number', label: '_Maximum Startup Power (Protection)', 
+                    name: 'STARTUP_POWER_MAX', type: 'number', label: '_Maximum Startup Power (Protection)',
                     // Note: The real displayFactor is 1000 / 255 but 250 makes the slider nicer to work with minimal loss of accuracy
                     min: 1004, max: 1300, step: 4, displayFactor: 1000 / 250, displayOffset: 1000, displayPrecision: 0
                 },
@@ -327,8 +401,21 @@ var BLUEJAY_INDIVIDUAL_SETTINGS = [
             { value: '3', label: 'Bidirectional' }, { value: '4', label: 'Bidirectional Reversed' }
         ]
     },
+    {
+        name: 'STARTUP_MELODY', type: 'melody', label: 'startupMelody',
+        melodyLength: 128
+    }
 ];
 
+var BLUEJAY_INDIVIDUAL_SETTINGS_200 = [
+    {
+        name: 'MOTOR_DIRECTION', type: 'enum', label: 'escMotorDirection',
+        options: [
+            { value: '1', label: 'Normal' }, { value: '2', label: 'Reversed' },
+            { value: '3', label: 'Bidirectional' }, { value: '4', label: 'Bidirectional Reversed' }
+        ]
+    },
+];
 
 var BLHELI_S_INDIVIDUAL_SETTINGS_BACKWARD = [
     {
@@ -354,9 +441,10 @@ var BLHELI_S_INDIVIDUAL_SETTINGS_BACKWARD = [
 ]
 
 var BLUEJAY_INDIVIDUAL_SETTINGS_DESCRIPTIONS = {
-    '202': { base: BLUEJAY_INDIVIDUAL_SETTINGS },
-    '201': { base: BLUEJAY_INDIVIDUAL_SETTINGS },
-    '200': { base: BLUEJAY_INDIVIDUAL_SETTINGS },
+    '203': { base: BLUEJAY_INDIVIDUAL_SETTINGS },
+    '202': { base: BLUEJAY_INDIVIDUAL_SETTINGS_200 },
+    '201': { base: BLUEJAY_INDIVIDUAL_SETTINGS_200 },
+    '200': { base: BLUEJAY_INDIVIDUAL_SETTINGS_200 },
     '33': { base: BLHELI_S_INDIVIDUAL_SETTINGS_BACKWARD }
 };
 

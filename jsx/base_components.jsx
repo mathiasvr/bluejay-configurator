@@ -91,3 +91,152 @@ var Number = React.createClass({
         return val;
     }
 });
+
+var Melody = React.createClass({
+    getInitialState () {
+        return {
+            melody: null,
+            osc: null
+        };
+    },
+    componentDidUpdate(prevProps) {
+        if (!this || !this.props) {
+            return
+        }
+
+        if (prevProps.currentSettingsInstanceId != this.props.currentSettingsInstanceId) {
+            this.stopMelody()
+            this.setState({ melody: null })
+            return
+        }
+
+        if (prevProps.doPlayMusic != this.props.doPlayMusic && this.props.doPlayMusic) {
+            this.playMelody()
+        } else if (prevProps.doStopMusic != this.props.doStopMusic && this.props.doStopMusic) {
+            this.stopMelody()
+        } else {
+            //Do Nothing
+        }
+    },
+    render: function() {
+        return (
+            <div className={this.props.isMelodyEditorShown? "melody" : "hidden"}>
+                <label>
+                    <span className={this.props.notInSync ? "not-in-sync label" : "label"}>{hacks(this.props.label)}</span>
+                    <span className="btn melody_btn">
+                        <a className={this.state.melody === null || this.state.melody === Rtttl.fromBluejayStartupMelody(this.props.value) ? "disabled" : ""}
+                            href="#"
+                            onClick={this.acceptMelody}
+                        >
+                            {chrome.i18n.getMessage('escButtonAccept')}
+                        </a>
+                    </span>
+                    <span className="btn melody_btn">
+                        <a
+                            href="#"
+                            onClick={this.togglePlayMelody}
+                        >
+                            {this.state.osc? chrome.i18n.getMessage('escButtonStop') : chrome.i18n.getMessage('escButtonPlay')}
+                        </a>
+                    </span>
+                    <textarea
+                        name={this.props.name}
+                        value={this.getDisplayValue()}
+                        onChange={this.handleChange}
+                    />
+                </label>
+            </div>
+        );
+    },
+    handleChange: function(e) {
+        this.setState({melody: e.target.value})
+    },
+    getDisplayValue: function() {
+        return this.state.melody === null ? Rtttl.fromBluejayStartupMelody(this.props.value) : this.state.melody;
+    },
+    acceptMelody: function() {
+        try {
+            // Little Easter egg
+            let melody = this.state.melody === null ? Rtttl.fromBluejayStartupMelody(this.props.value) : this.state.melody
+            melody = melody.trim() === ":D"
+                     ? "D:d=4,o=5,b=112:32c,8d.,16f.,16p.,8f,32d,16e.,8d,8c,8a4,8d.,16g.,16p.,8g"
+                     : melody
+            let bluejayStartupMelody = Rtttl.toBluejayStartupMelody(melody, this.props.melodyLength)
+            let startupMelody = bluejayStartupMelody.data
+            var self = this
+            // Update the displayValue so we are looking at the accepted melody
+            this.setState({melody: null}, function(){
+                self.props.onChange(self.props.name, startupMelody);
+            })
+
+            // Error reporting in the GUI console
+            let errorNotes = new Set()
+            let melodyNotes = melody.split(':')[2].split(',')
+            for (var i = 0; i < bluejayStartupMelody.errorCodes.length; i++) {
+                if (bluejayStartupMelody.errorCodes[i] === 1) {
+                    errorNotes.add(melodyNotes[i].trim())
+                }
+            }
+            if (errorNotes.size > 0) {
+                self.props.GUI.log(chrome.i18n.getMessage('errorCantConvertMelodyNotes') + ': ' + Array.from(errorNotes).join(', '))
+            }
+            if (bluejayStartupMelody.errorCodes.some((v) => v == 2)) {
+                self.props.GUI.log(chrome.i18n.getMessage('errorMelodyTooLong'))
+            }
+        } catch (err) {
+            alert(chrome.i18n.getMessage('errorParsingRtttl'))
+        }
+    },
+    togglePlayMelody: function() {
+        if (this.state.osc) {
+            this.stopMelody()
+        } else {
+            this.playMelody()
+        }
+    },
+    playMelody: function() {
+        if (this.state.osc) {
+            this.props.onPlaybackStateChanged(true)
+            return
+        }
+        try {
+            const melody = this.state.melody || Rtttl.fromBluejayStartupMelody(this.props.value)
+            const parsedRtttl = Rtttl.parse(melody).melody
+
+            let audioContext = new AudioContext()
+            let osc = audioContext.createOscillator()
+            let volume = audioContext.createGain()
+
+            osc.type = 'square'
+            osc.connect(volume)
+            volume.gain.value = 0.05
+
+            volume.connect(audioContext.destination)
+            let t = audioContext.currentTime
+            for (const note of parsedRtttl) {
+                osc.frequency.setValueAtTime(note.frequency, t)
+                t += note.duration / 1000
+            }
+            osc.start(0)
+            osc.stop(t)
+
+            osc.onended = () => {
+                audioContext.close()
+                this.setState({ osc: null })
+                this.props.onPlaybackStateChanged(false)
+            }
+
+            this.setState({ osc: osc }, () => {
+                this.props.onPlaybackStateChanged(true)
+            })
+        } catch(err) {
+            alert(chrome.i18n.getMessage('errorParsingRtttl'))
+            this.props.onPlaybackStateChanged(false)
+        }
+    },
+    stopMelody: function() {
+        if (this.state.osc) {
+            this.state.osc.stop()
+        }
+    }
+});
