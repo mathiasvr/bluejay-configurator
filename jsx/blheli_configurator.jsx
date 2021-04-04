@@ -1106,7 +1106,7 @@ var Configurator = React.createClass({
                             {chrome.i18n.getMessage('resetDefaults')}
                         </a>
                     </div>
-                    <div className={this.state.canPlayMusic ? "btn" : "hidden"}>
+                    <div className={this.state.isMelodyEditorShown ? "btn" : "hidden"}>
                         <a
                             href="#"
                             className={!this.state.selectingFirmware && !this.state.IsFlashing && this.state.canWrite ? "" : "disabled"}
