@@ -23,7 +23,9 @@ var Configurator = React.createClass({
             ignoreMCULayout: false,
 
             flashingEscIndex: undefined,
-            flashingEscProgress: 0
+            flashingEscProgress: 0,
+
+            currentSettingsInstanceId: 0
         };
     },
     componentWillMount: function() {
@@ -117,7 +119,8 @@ var Configurator = React.createClass({
             isPlayingMusic: false,
             doPlayMusic: false,
             doStopMusic: false,
-            musicPlaybackStatus: (new Array(this.state.escSettings.length)).fill(false)
+            musicPlaybackStatus: (new Array(this.state.escSettings.length)).fill(false),
+            currentSettingsInstanceId: this.state.currentSettingsInstanceId + 1
         });
 
         $('a.connect').removeClass('disabled');
@@ -1208,6 +1211,7 @@ var Configurator = React.createClass({
                 supportedBlheliESCs={this.state.supportedBlheliESCs}
                 supportedOpenEscESCs={this.state.supportedOpenEscESCs}
                 supportedBluejayESCs={this.state.supportedBluejayESCs}
+                currentSettingsInstanceId={this.state.currentSettingsInstanceId}
                 onUserInput={this.onUserInput}
             />
         );
@@ -1234,6 +1238,7 @@ var Configurator = React.createClass({
                     isMelodyEditorShown={this.state.isMelodyEditorShown}
                     doPlayMusic={this.state.doPlayMusic}
                     doStopMusic={this.state.doStopMusic}
+                    currentSettingsInstanceId={this.state.currentSettingsInstanceId}
                     onMusicPlaybackStateChanged={this.onMusicPlaybackStateChanged}
                     GUI={GUI}
                 />

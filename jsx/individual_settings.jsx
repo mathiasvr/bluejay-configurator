@@ -136,6 +136,7 @@ var IndividualSettings = React.createClass({
                         doPlayMusic={this.props.doPlayMusic}
                         doStopMusic={this.props.doStopMusic}
                         onPlaybackStateChanged={this.handlePlaybackStateChange}
+                        currentSettingsInstanceId={this.props.currentSettingsInstanceId}
                         GUI={this.props.GUI}
                     />
                 );

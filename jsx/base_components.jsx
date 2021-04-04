@@ -104,6 +104,12 @@ var Melody = React.createClass({
             return
         }
 
+        if (prevProps.currentSettingsInstanceId != this.props.currentSettingsInstanceId) {
+            this.stopMelody()
+            this.setState({ melody: null })
+            return
+        }
+
         if (prevProps.doPlayMusic != this.props.doPlayMusic && this.props.doPlayMusic) {
             this.playMelody()
         } else if (prevProps.doStopMusic != this.props.doStopMusic && this.props.doStopMusic) {
