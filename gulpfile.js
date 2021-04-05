@@ -352,7 +352,7 @@ function release_chromeos() {
 
 // Create distribution package for macOS platform
 function release_osx64() {
-    var appdmg = require('gulp-appdmg');
+    var appdmg = require('./gulp-appdmg.js');
 
     return gulp.src(['.'])
         .pipe(appdmg({

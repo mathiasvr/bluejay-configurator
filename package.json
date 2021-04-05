@@ -42,7 +42,7 @@
     "temp": "^0.9.2"
   },
   "optionalDependencies": {
-    "gulp-appdmg": "^1.0.3"
+    "appdmg": "^0.6.0"
   },
   "scripts": {
     "build": "babel tabs/esc.jsx -o js/build/esc.js && babel jsx --out-dir js/build",
