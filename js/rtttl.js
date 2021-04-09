@@ -16,8 +16,6 @@
 // ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"use strict";
-
 class Rtttl {
 
 /**
@@ -52,8 +50,8 @@ static parse(rtttl) {
  * @param {string} rtttl - RTTTL String
  * @param {int} startupMelodyLength - Bluejay Temp4,Temp3 array length. If unspecified, it is assumed to be 128 bytes
  * @returns an object {
- *     "startupMelodyData": [] , // An array of (Number of pulses, Pulse width) tuples for each note of rtttl
- *     "errorCodes": [] // An array of errors encountered while processing each note of rtttl
+ *     data: [] , // An array of (Number of pulses, Pulse width) tuples for each note of rtttl
+ *     errorCodes: [] // An array of errors encountered while processing each note of rtttl
  * }
  *
  * Startup melody data structure is:
@@ -69,10 +67,10 @@ static parse(rtttl) {
 static toBluejayStartupMelody(rtttl, startupMelodyLength) {
 
   let parsedData = Rtttl.parse(rtttl);
-  startupMelodyLength = startupMelodyLength || 128;
+  startupMelodyLength = (typeof startupMelodyLength === 'number')? startupMelodyLength : 128;
 
   if (startupMelodyLength < 4) {
-    throw new Error("startupMelodyLength is too small to fit a Bluejay Startup Melody");
+    throw new Error('startupMelodyLength is too small to fit a Bluejay Startup Melody');
   }
 
   // Melody is basically an array of [{ duration(in ms): number, frequency (in Hz): number }]
@@ -84,8 +82,8 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
   let bpm = Math.floor(parsedData.defaults.bpm) % (2**16);
   result[0] = (bpm >> 8) & (2**8 - 1);
   result[1] = (bpm) & (2**8 - 1);
-  result[2] = Math.floor(parsedData.defaults.octave) % (2**8);
-  result[3] = Math.floor(parsedData.defaults.duration) % (2**8);
+  result[2] = Math.floor(parsedData.defaults.octave) % (MAX_ITEM_VALUE);
+  result[3] = Math.floor(parsedData.defaults.duration) % (MAX_ITEM_VALUE);
 
   var currentResultIndex = 4;
   var currentMelodyIndex = 0;
@@ -116,7 +114,6 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
           errorCodes[currentMelodyIndex] = 0;
         }
       } else {
-          console.warn("Skipping note of frequency: ", item.frequency)
           errorCodes[currentMelodyIndex] = 1;
       }
     } else {
@@ -148,9 +145,9 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
   }
 
   return {
-    "data": result,
-    "errorCodes": errorCodes
-  }
+    data: result,
+    errorCodes: errorCodes
+  };
 
 }
 
@@ -163,10 +160,10 @@ static toBluejayStartupMelody(rtttl, startupMelodyLength) {
  */
 static fromBluejayStartupMelody(startupMelodyData, melodyName) {
 
-  melodyName = melodyName || "Melody"
+  melodyName = melodyName || 'Melody'
 
   if (startupMelodyData.length < 4) {
-    return melodyName + "Melody:d=1,o=4,bpm=100:";
+    return melodyName + 'Melody:d=1,o=4,bpm=100:';
   }
 
   let defaults = {
@@ -174,16 +171,15 @@ static fromBluejayStartupMelody(startupMelodyData, melodyName) {
       octave: startupMelodyData[2],
       duration: startupMelodyData[3]
   };
-  let fourthNoteDuration = 60000/defaults.bpm;
-  let sixtyFourthNoteDuration = fourthNoteDuration/16;
-  let fullNoteDuration = 4*fourthNoteDuration;
 
   let melodyNotes = [];
 
   // First try to glob all the same adjacent notes, that could have been split up due to Temp4 size limits
   for (var i = 4; i + 1 < startupMelodyData.length; i += 2){
-    let freq = Rtttl._calculateFrequencyFromBluejayTemp3(startupMelodyData[i+1]);
-    let dur = freq == 0? startupMelodyData[i] : (1000/freq)*startupMelodyData[i];
+    const freq = Rtttl._calculateFrequencyFromBluejayTemp3(startupMelodyData[i+1]);
+    const note = Rtttl._calculateNoteNameFromFrequency(freq);
+    const octave = Rtttl._calculateNoteOctaveFromFrequency(freq);
+    const dur = freq == 0? startupMelodyData[i] : (1000/Rtttl._calculateFrequency(note, octave))*startupMelodyData[i];
 
     if (dur > 0) {
         // Two adjacent notes of same frequency can be assumed to be split up IF
@@ -197,31 +193,79 @@ static fromBluejayStartupMelody(startupMelodyData, melodyName) {
             melodyNotes.push({
                               duration: dur,
                               frequency: freq,
-                              musicalDuration: 1,
-                              musicalNote: Rtttl._calculateNoteNameFromFrequency(freq),
-                              musicalOctave: Rtttl._calculateNoteOctaveFromFrequency(freq)});
+                              musicalNote: note,
+                              musicalOctave: octave});
         }
     } else {
         break;
     }
   }
 
-  let quantizedDuration = (duration) => Math.round(duration/sixtyFourthNoteDuration)*sixtyFourthNoteDuration;
-  let rttlDuration = (musicalDuration) => Math.pow(2, -Math.floor(Math.log2(musicalDuration)));
+  const fullNoteDuration = 4*60000/defaults.bpm;
+/*
+  // Alternative implementation where we are trying to find the closest note duration
+  const closestIndex = (array, value) => {
+      if (array.length < 1) {
+          return -1;
+      }
+
+      let result = 0;
+      let start = 0;
+      let end = array.length;
+
+      while (end >= start) {
+        let mid = start + Math.floor((end - start)/2);
+        result = Math.abs(array[mid] - value) < Math.abs(array[result] - value) ? mid : result;
+        if(value > array[mid]) {
+            start = mid + 1;
+        } else {
+            end = mid - 1;
+        }
+      }
+
+      return result;
+  }
+
+  const maximumDots = 1;
+  const dottedDurationMultipliers = [1, 1.5, 1.75, 1.875, 1.9375].splice(0, maximumDots + 1);
+  const durations = [1/32, 1/16, 1/8, 1/4, 1/2, 1].map((d) => dottedDurationMultipliers.map((m) => d*m)).flat();
 
   let melodyString = ''
   for (var item of melodyNotes) {
-    item.musicalDuration = quantizedDuration(item.duration)/fullNoteDuration;
+    let musicalDuration = item.duration/fullNoteDuration;
 
-    while (item.musicalDuration > 0) {
-      let musicalDuration = item.musicalDuration > 1.5 ? 1.5 : item.musicalDuration; // Maximum allowed note is one and a half note
-      let isDottedNote = Math.log2(musicalDuration) - Math.floor(Math.log2(musicalDuration)) !== 0
-      melodyString += (rttlDuration(musicalDuration) === defaults.duration && !isDottedNote? '' : rttlDuration(musicalDuration)) +
+    while (musicalDuration > 0) {
+      const itemDuration = Math.min(dottedDurationMultipliers.length, musicalDuration); // Longest allowed note is a full note with 4 dots
+      const durationIndex = closestIndex(durations, itemDuration);
+      const rtttlDuration = Math.pow(2, 5 - Math.floor(durationIndex/dottedDurationMultipliers.length));
+      const dots = '.'.repeat(durationIndex % dottedDurationMultipliers.length);
+
+      melodyString += (rtttlDuration === defaults.duration? '' : rtttlDuration) +
+                      (item.musicalNote) +
+                      (item.musicalOctave === defaults.octave || item.musicalOctave === 0 ? '' : item.musicalOctave) +
+                      (dots) +
+                      ',';
+      musicalDuration -= itemDuration;
+    }
+  }
+*/
+  let smallestMusicalDuration = fullNoteDuration/64; // Smallest Note duration is 1/32nd note's dot
+  let quantizedDuration = (duration) => Math.round(duration/smallestMusicalDuration)*smallestMusicalDuration;
+
+  let melodyString = ''
+  for (var item of melodyNotes) {
+    let musicalDuration = quantizedDuration(item.duration)/fullNoteDuration;
+
+    while (musicalDuration > 1/64) {
+      let currentDuration = Math.min(1.5, musicalDuration); // Maximum allowed note is one and a half note
+      let rtttlDuration = Math.pow(2, -Math.floor(Math.log2(currentDuration)));
+      let isDottedNote = currentDuration*rtttlDuration > 1
+      melodyString += (rtttlDuration === defaults.duration ? '' : rtttlDuration) +
                       (item.musicalNote) +
                       (item.musicalOctave === defaults.octave || item.musicalOctave === 0 ? '' : item.musicalOctave) +
                       (isDottedNote ? '.' : '') + // Add a dot at the end of half notes
                       ',';
-      item.musicalDuration -= musicalDuration;
+      musicalDuration -= currentDuration;
     }
   }
 
@@ -350,17 +394,19 @@ static getData(melody, defaults) {
 
   return NOTES.map((note) => {
 
-    const NOTE_REGEX = /(1|2|4|8|16|32|64)?((?:[a-g]|h|p)#?){1}(\.?)(4|5|6|7)?/;
+    const NOTE_REGEX = /(1|2|4|8|16|32|64)?((?:[a-g]|h|p)#?){1}(\.*)(1|2|3|4|5|6|7|8)?(\.*)/;
     const NOTE_PARTS = note.match(NOTE_REGEX);
 
     const NOTE_DURATION = NOTE_PARTS[1] || parseInt(defaults.duration);
     const NOTE          = NOTE_PARTS[2] === 'h' ? 'b' : NOTE_PARTS[2];
-    const NOTE_DOTTED   = NOTE_PARTS[3] === '.';
     const NOTE_OCTAVE   = NOTE_PARTS[4] || parseInt(defaults.octave);
+    const NOTE_DOTS     = NOTE_PARTS[3] && NOTE_PARTS[3][0] === '.' ? NOTE_PARTS[3].length:
+                          NOTE_PARTS[5] && NOTE_PARTS[5][0] === '.' ? NOTE_PARTS[5].length:
+                                                                      0;
 
     return {
       note: NOTE,
-      duration: Rtttl._calculateDuration(BEAT_EVERY, parseFloat(NOTE_DURATION), NOTE_DOTTED),
+      duration: Rtttl._calculateDuration(BEAT_EVERY, parseFloat(NOTE_DURATION), NOTE_DOTS),
       frequency: Rtttl._calculateFrequency(NOTE, NOTE_OCTAVE)
     };
   });
@@ -414,11 +460,12 @@ static _calculateNoteNameFromFrequency(freq) {
 
     const C4           = 261.63;
     const NOTE_ORDER          = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
-    const MIDDLE_OCTAVE       = 4;
     const SEMITONES_IN_OCTAVE = 12;
-    const noteSemitones = Math.round(12 * Math.log2(freq/C4))
+    const noteSemitones = Math.round(SEMITONES_IN_OCTAVE * Math.log2(freq/C4));
+    const noteIndex = noteSemitones < 0 ? 12 + noteSemitones % SEMITONES_IN_OCTAVE
+                                        : noteSemitones % SEMITONES_IN_OCTAVE;
 
-    return NOTE_ORDER[noteSemitones % 12]
+    return NOTE_ORDER[noteIndex]
 }
 
 /**
@@ -437,7 +484,7 @@ static _calculateNoteOctaveFromFrequency(freq) {
     const MIDDLE_OCTAVE       = 4;
     const SEMITONES_IN_OCTAVE = 12;
 
-    let noteSemitones = Math.round(12 * Math.log2(freq/C4))
+    let noteSemitones = Math.round(SEMITONES_IN_OCTAVE * Math.log2(freq/C4))
     let noteOctave = MIDDLE_OCTAVE + Math.floor(noteSemitones/SEMITONES_IN_OCTAVE)
 
     return noteOctave
@@ -448,14 +495,18 @@ static _calculateNoteOctaveFromFrequency(freq) {
  *
  * @param {number} beatEvery
  * @param {number} noteDuration
- * @param {boolean} isDotted
+ * @param {number} dots
  * @returns {number}
  * @private
  */
-static _calculateDuration(beatEvery, noteDuration, isDotted) {
+static _calculateDuration(beatEvery, noteDuration, dots) {
   const DURATION = (beatEvery * 4) / noteDuration;
-  const PROLONGED = isDotted ? (DURATION / 2) : 0;
-  return DURATION + PROLONGED;
+  return DURATION*(dots === 4 ? 1.9375:
+                   dots === 3 ? 1.875:
+                   dots === 2 ? 1.75:
+                   dots === 1 ? 1.5:
+                                1
+                   );
 }
 
 /**
