@@ -25,7 +25,7 @@ var debugDir = './debug/';
 var releaseDir = './release/';
 var jsBuildDir = './js/build/'
 
-const nwVersion = '0.52.1';
+const nwVersion = '0.52.2';
 
 // -----------------
 // Helper functions
