@@ -391,7 +391,7 @@
         "message": "Accept"
     },
     "stopStartupMusic": {
-        "message": "Stop"
+        "message": "Stop All"
     },
     "playStartupMusic": {
         "message": "Play All"
