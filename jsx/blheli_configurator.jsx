@@ -215,7 +215,14 @@ var Configurator = React.createClass({
     },
     // @todo add validation of each setting via BLHELI_SETTINGS_DESCRIPTION
     writeSetupAll: async function() {
+        //Update escSettings' wait time after playing back their tune so they all start the dshot beacons at the same time
+        const melodyDurations = this.state.escSettings.map((s) => { Rtttl.parse(Rtttl.fromBluejayStartupMelody(s.STARTUP_MELODY)).melody.reduce((a, b)=> a + b.duration, 0) });
+        const maxMelodyDuration = melodyDurations.reduce((a, b) => Math.max(a, b), 0);
+
         for (var esc = 0; esc < this.state.escSettings.length; ++esc) {
+            const melodyWaitDifference = maxMelodyDuration - melodyDurations[esc];
+            this.state.escSettings[esc].STARTUP_MELODY_WAIT_MS_MSB = (melodyWaitDifference >> 8) & (2**8 - 1);
+            this.state.escSettings[esc].STARTUP_MELODY_WAIT_MS_LSB = (melodyWaitDifference) & (2**8 - 1);
             await this.writeSetupImpl(esc);
         }
     },
