@@ -2,7 +2,7 @@
   "name": "bluejay-configurator",
   "description": "Cross-platform configuration tool for BLHeli-based electronic speed controllers",
   "private": true,
-  "version": "1.3.6",
+  "version": "1.3.7",
   "main": "main_nwjs.html",
   "bg-script": "eventPage.js",
   "default_locale": "en",
