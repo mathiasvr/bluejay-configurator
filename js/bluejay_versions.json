@@ -1,9 +1,9 @@
 {
 	"EFM8": [
 		{
-			"name": "0.14 (TEST VERSION)",
-			"url": "https://github.com/mathiasvr/bluejay/releases/download/v0.14-test/{0}_v0.13.hex",
-			"key": "0.14-test",
+			"name": "0.14",
+			"url": "https://github.com/mathiasvr/bluejay/releases/download/v0.14/{0}_v0.14.hex",
+			"key": "0.14",
 			"configurator": "1.3.5"
 		},
 		{
