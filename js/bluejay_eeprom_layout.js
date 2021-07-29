@@ -23,7 +23,7 @@ var BLHELI_SILABS_BOOTLOADER_SIZE       = 0x0200
 var BLHELI_SILABS_FLASH_SIZE            = 0x2000
 var BLHELI_SILABS_ADDRESS_SPACE_SIZE    = BLHELI_SILABS_BOOTLOADER_ADDRESS
 
-var BLHELI_LAYOUT_SIZE = 0xF0
+var BLHELI_LAYOUT_SIZE = 0xF2
 var BLHELI_MIN_SUPPORTED_LAYOUT_REVISION = 0x13
 
 var BLHELI_S_MIN_LAYOUT_REVISION = 0x20
@@ -76,7 +76,9 @@ var BLHELI_LAYOUT = {
     MCU:                        {   offset: 0x50, size: 16   },
     NAME:                       {   offset: 0x60, size: 16   },
 
-    STARTUP_MELODY:             {   offset: 0x70, size: 128  }
+    STARTUP_MELODY:             {   offset: 0x70, size: 128  },
+    STARTUP_MELODY_WAIT_MS_MSB: {   offset: 0xF0, size: 1   },
+    STARTUP_MELODY_WAIT_MS_LSB: {   offset: 0xF1, size: 1   }
 };
 
 function blheliModeToString(mode) {
